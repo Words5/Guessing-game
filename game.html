@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Emoji – اللعب</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .game-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.85);
+      text-align: center;
+    }
+    #itemsGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .item {
+      font-size: 60px;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .item.clicked {
+      background: #f0f0f0;
+      font-size: 24px;
+      pointer-events: none;
+    }
+    #statusText {
+      font-size: 28px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .title {
+      font-size: 36px;
+      color: #d62828;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="title">🎮 لعبة الإيموجي العشوائية</div>
+    <h1 id="statusText"></h1>
+    <div id="itemsGrid"></div>
+    <button id="restartBtn" class="btn" style="display:none">⬅️ العودة للبداية</button>
+  </div>
+  <script>
+    const topics = {
+      fruits:['🍎','🍌','🍇','🍒','🍉','🍍','🥭','🍐'],
+      planets:['🪐','🌍','🌕','☀️','🌑','🌏','🛰️'],
+      food:['🍕','🍟','🍔','🍣','🍜','🍩','🥗'],
+      flags:['🇸🇦','🇪🇬','🇸🇾','🇶🇦','🇦🇪','🇰🇼','🇧🇭','🇴🇲']
+    };
+
+    const backgrounds = {
+      fruits: 'url("img/bg_fruits.jpg")',
+      planets: 'url("img/bg_planets.jpg")',
+      food: 'url("img/bg_food.jpg")',
+      flags: 'url("img/bg_flags.jpg")'
+    };
+
+    const words = JSON.parse(sessionStorage.getItem('words') || '[]');
+    const topic = sessionStorage.getItem('topic') || 'fruits';
+    const grid = document.getElementById('itemsGrid');
+    const status = document.getElementById('statusText');
+    const restart = document.getElementById('restartBtn');
+
+    document.body.style.backgroundImage = backgrounds[topic];
+
+    let remaining = [...words];
+    const emojis = topics[topic];
+
+    for (let i = 0; i < remaining.length; i++) {
+      const emo = emojis[i % emojis.length];
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.textContent = emo;
+
+      div.onclick = () => {
+        if (div.classList.contains('clicked')) return;
+        const idx = Math.floor(Math.random() * remaining.length);
+        const name = remaining.splice(idx, 1)[0];
+        div.textContent = name;
+        div.classList.add('clicked');
+
+        if (remaining.length === 0) {
+          status.textContent = `🎉 الفائز: ${name}`;
+          restart.style.display = 'inline-block';
+        }
+      };
+
+      grid.appendChild(div);
+    }
+
+    restart.onclick = () => window.location = 'index.html';
+  </script>
+</body>
+</html>
