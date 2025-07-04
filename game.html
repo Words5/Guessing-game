@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة التخمين</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      direction: rtl;
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.8s ease-in-out;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: rgba(255,255,255,0.8);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    #itemsGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .item {
+      font-size: 24px;
+      padding: 10px 20px;
+      background: #eee;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>اختر العنصر الصحيح</h2>
+    <div id="itemsGrid"></div>
+  </div>
+
+  <script>
+    const topic = sessionStorage.getItem("topic") || "default";
+    const words = JSON.parse(sessionStorage.getItem("words")) || [];
+
+    const bgMap = {
+      "fruits": "img/bg_fruits.jpg",
+      "planets": "img/bg_planets.jpg",
+      "food": "img/bg_food.jpg",
+      "flags": "img/bg_flags.jpg"
+    };
+
+    document.body.style.backgroundImage = `url('${bgMap[topic] || 'img/bg_default.jpg'}')`;
+
+    const grid = document.getElementById("itemsGrid");
+    words.forEach(word => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.textContent = word;
+      grid.appendChild(div);
+    });
+  </script>
+</body>
+</html>
