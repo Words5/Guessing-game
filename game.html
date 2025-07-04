@@ -49,10 +49,10 @@
     const words = JSON.parse(sessionStorage.getItem("words")) || [];
 
     const bgMap = {
-      "fruits": "img/bg_fruits.jpg",
-      "planets": "img/bg_planets.jpg",
-      "food": "img/bg_food.jpg",
-      "flags": "img/bg_flags.jpg"
+      "fruits": "fruits.jpg",
+      "planets": "planets.jpg",
+      "food": "food.jpg",
+      "flags": "flags.jpg"
     };
 
     document.body.style.backgroundImage = `url('${bgMap[topic] || 'img/bg_default.jpg'}')`;
