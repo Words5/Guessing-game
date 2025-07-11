@@ -3,182 +3,63 @@
   <meta charset="UTF-8">
   <title>حرب العناصر</title>
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url('fruits.jpg'); /* يتم تغييره تلقائي حسب الفئة */
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      direction: rtl;
+      min-height: 100vh;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      transition: background-image 0.8s ease-in-out;
     }
     .title {
-      margin-top: 30px;
-      font-size: 36px;
-      color: #fff;
+      text-align: center;
+      font-size: 32px;
       font-weight: bold;
-      text-shadow: 2px 2px 5px #000;
-    }
-    .emoji-box {
-      margin-top: 30px;
-      width: 80vw;
-      max-width: 800px;
-      min-height: 300px;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 20px;
       padding: 20px;
+      color: white;
+      background: rgba(0,0,0,0.5);
+    }
+    .emoji-container {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
       gap: 20px;
-    }
-    .emoji-item {
-      width: 80px;
-      height: 80px;
-      font-size: 40px;
-      background: #fff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      align-items: center;
+      max-width: 800px;
+      margin: 40px auto;
+      background: rgba(255,255,255,0.2);
+      padding: 30px;
+      border-radius: 20px;
+      min-height: 300px;
     }
-    .emoji-item:hover {
+    .item {
+      font-size: 60px;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .item:hover {
       transform: scale(1.1);
     }
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+    .item.faded {
+      background: transparent;
+      pointer-events: none;
     }
-    .message-box {
-      background: #fff5cc;
-      padding: 40px 60px;
-      border-radius: 20px;
-      text-align: center;
-      font-size: 30px;
-      color: #222;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-    .winner {
-      font-weight: bold;
-      color: #d4af37; /* ذهبي */
-      font-size: 40px;
-    }
-    #restartBtn {
-      margin-top: 20px;
-      padding: 12px 30px;
+    .item .name {
       font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #222;
-      color: white;
+      color: #444;
+      font-weight: bold;
+      animation: fadeOut 2.5s forwards;
     }
-  </style>
-</head>
-<body>
-  <div class="title" id="gameTitle">اللعبة</div>
-  <div class="emoji-box" id="emojiBox"></div>  <div class="overlay" id="messageOverlay" style="display:none" onclick="hideOverlay()">
-    <div class="message-box" id="messageBox">
-      <div id="messageText"></div>
-      <div id="restartContainer" style="display:none">
-        <button id="restartBtn" onclick="restartGame(event)">🔁 إعادة اللعبة</button>
-      </div>
-    </div>
-  </div>  <script>
-    const topic = sessionStorage.getItem("topic") || "fruits";
-    const words = JSON.parse(sessionStorage.getItem("words") || "[]");
-
-    const emojiMap = {
-      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒"],
-      "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝"],
-      "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸"]
-    };
-
-    const backgroundMap = {
-      "fruits": "fruits.jpg",
-      "food": "food.jpg",
-      "flags": "flags.jpg"
-    };
-    document.body.style.backgroundImage = `url('${backgroundMap[topic]}')`;
-
-    document.getElementById("gameTitle").textContent = `حرب ${topic === 'fruits' ? 'الفواكه' : topic === 'food' ? 'الأكل' : 'الأعلام'}`;
-
-    const emojiBox = document.getElementById("emojiBox");
-    const emojis = [...emojiMap[topic]];
-    const players = [...words];
-    const usedEmojis = new Set();
-
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    function showOverlay(message, isWinner = false) {
-      const overlay = document.getElementById("messageOverlay");
-      const text = document.getElementById("messageText");
-      const restart = document.getElementById("restartContainer");
-      text.innerHTML = message;
-      overlay.style.display = "flex";
-      restart.style.display = isWinner ? "block" : "none";
-    }
-
-    function hideOverlay() {
-      const overlay = document.getElementById("messageOverlay");
-      overlay.style.display = "none";
-    }
-
-    function restartGame(e) {
-      e.stopPropagation();
-      window.location = "index.html";
-    }
-
-    shuffle(players);
-    shuffle(emojis);
-
-    const activeEmojis = players.map((name, index) => {
-      const emoji = emojis[index] || "❓";
-      const div = document.createElement("div");
-      div.className = "emoji-item";
-      div.textContent = emoji;
-      div.dataset.name = name;
-      div.onclick = () => {
-        if (div.clicked) return;
-        div.clicked = true;
-        div.textContent = name;
-        div.style.fontSize = "22px";
-        div.style.background = "#eee";
-        setTimeout(() => {
-          div.remove();
-          const remaining = document.querySelectorAll(".emoji-item");
-          if (remaining.length === 1) {
-            const winner = remaining[0].dataset.name;
-            showOverlay(`<span class='winner'>الفائز هو ${winner} 🎉</span>`, true);
-          } else {
-            showOverlay(`<span style='color:#d33;'>${name}</span> خسر! حظًا أوفر 🙈`);
-          }
-        }, 1500);
-      };
-      emojiBox.appendChild(div);
-    });
-  </script></body>
-</html>
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      90% { opacity: 1
