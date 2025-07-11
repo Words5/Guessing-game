@@ -6,6 +6,7 @@
   <style>
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background-size: cover;
       background-position: center;
@@ -14,132 +15,121 @@
       overflow-x: hidden;
     }
 
-    .game-title {
+    .title {
       text-align: center;
-      font-size: 36px;
-      margin: 30px 0 10px;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 1px 1px 3px #000;
+      font-size: 40px;
+      color: white;
+      margin-top: 20px;
+      text-shadow: 2px 2px 4px #000;
     }
 
-    .container {
-      width: 90%;
+    .emoji-grid-container {
+      width: 80%;
       max-width: 900px;
-      height: 500px;
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 20px;
+      margin: 30px auto;
       padding: 30px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
       gap: 20px;
-      overflow-y: auto;
+      min-height: 400px;
     }
 
-    .item {
+    .emoji-box {
+      font-size: 48px;
       width: 100px;
       height: 100px;
-      background: #f0f0f0;
-      font-size: 42px;
+      background: #fff;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 16px;
       cursor: pointer;
-      transition: transform 0.3s, opacity 1s ease-in-out;
-      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
     }
 
-    .item.revealed {
-      background: #fff;
-      font-size: 24px;
+    .emoji-box:hover {
+      transform: scale(1.1);
     }
 
-    .item.hidden {
-      opacity: 0;
-    }
-
-    .popup-overlay {
+    .overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.75);
-      display: none;
-      align-items: center;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: flex;
       justify-content: center;
-      z-index: 9999;
+      align-items: center;
     }
 
-    .popup {
-      background-color: #1a1a1a;
-      padding: 60px;
+    .result-box {
+      background: #fff;
       border-radius: 20px;
-      color: white;
+      padding: 40px;
       text-align: center;
-      font-size: 32px;
-      max-width: 90%;
-      width: 600px;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
 
-    .popup .name {
-      color: #FFD700;
+    .result-box h2 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .winner {
+      color: #d4af37; /* ذهبي */
       font-size: 40px;
       font-weight: bold;
-      margin-top: 20px;
     }
 
-    .restart-btn {
-      margin-top: 30px;
-      padding: 15px 30px;
-      font-size: 20px;
-      background: #FFD700;
+    .loser {
+      color: crimson;
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .retry-btn {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background-color: #333;
+      color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      display: none;
     }
 
-    .restart-btn:hover {
-      background: #e6c200;
+    .retry-btn:hover {
+      background-color: #555;
     }
   </style>
 </head>
 <body>
-  <h2 class="game-title" id="gameTitle">حرب العناصر</h2>
-  <div class="container" id="itemsGrid"></div>
+  <h1 class="title" id="gameTitle">لعبة</h1>
 
-  <div class="popup-overlay" id="loseOverlay" onclick="hideLosePopup()">
-    <div class="popup">
-      💔 حظ أوفر
-      <div class="name" id="loserName"></div>
-    </div>
-  </div>
+  <div class="emoji-grid-container" id="emojiGrid"></div>
 
-  <div class="popup-overlay" id="winOverlay">
-    <div class="popup">
-      🏆 الفائز هو
-      <div class="name" id="winnerName"></div>
-      <button class="restart-btn" onclick="restartGame()">🔁 إعادة اللعبة</button>
+  <div class="overlay" id="resultOverlay" style="display: none;" onclick="hideOverlay()">
+    <div class="result-box" id="resultBox">
+      <h2 id="resultText">الفائز هو</h2>
+      <div id="resultName" class="winner"></div>
+      <button class="retry-btn" id="retryBtn" onclick="restartGame(event)">إعادة اللعبة</button>
     </div>
   </div>
 
   <script>
     const topic = sessionStorage.getItem("topic") || "default";
-    const words = JSON.parse(sessionStorage.getItem("words")) || [];
-
-    const bgMap = {
-      "fruits": "fruits.jpg",
-      "food": "food.jpg",
-      "flags": "flags.jpg"
-    };
+    const names = JSON.parse(sessionStorage.getItem("words")) || [];
 
     const emojiMap = {
-      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
       "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
       "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
       "default": ["❓"]
@@ -149,67 +139,72 @@
       "fruits": "🍎 حرب الفواكه",
       "food": "🍔 حرب الأكل",
       "flags": "🏳️ حرب الأعلام",
-      "default": "❓ لعبة التخمين"
+      "default": "❓ حرب"
     };
 
-    document.body.style.backgroundImage = `url('${bgMap[topic] || 'default.jpg'}')`;
-    document.getElementById("gameTitle").textContent = titleMap[topic] || titleMap.default;
+    const emojis = [...emojiMap[topic]];
+    const shuffledNames = [...names];
+    const usedIndices = new Set();
 
-    let remainingWords = [...words];
-    let usedEmojis = [];
+    document.getElementById("gameTitle").textContent = titleMap[topic] || "لعبة";
 
-    const grid = document.getElementById("itemsGrid");
-    const emojiList = emojiMap[topic] || emojiMap["default"];
+    const grid = document.getElementById("emojiGrid");
 
-    remainingWords.forEach(word => {
-      const emoji = emojiList.find(e => !usedEmojis.includes(e)) || "❓";
-      usedEmojis.push(emoji);
-
-      const div = document.createElement("div");
-      div.className = "item";
-      div.textContent = emoji;
-
-      div.addEventListener("click", function () {
-        if (document.getElementById("loseOverlay").style.display === "flex" ||
-            document.getElementById("winOverlay").style.display === "flex") return;
-
-        const randomIndex = Math.floor(Math.random() * remainingWords.length);
-        const selectedName = remainingWords.splice(randomIndex, 1)[0];
-        
-        div.textContent = selectedName;
-        div.classList.add("revealed");
-
-        setTimeout(() => {
-          div.classList.add("hidden");
-        }, 2000);
-
-        if (remainingWords.length === 1) {
-          showWinner(remainingWords[0]);
-        } else {
-          showLosePopup(selectedName);
-        }
-      });
-
-      grid.appendChild(div);
-    });
-
-    function showLosePopup(name) {
-      document.getElementById("loserName").textContent = name;
-      document.getElementById("loseOverlay").style.display = "flex";
+    for (let i = 0; i < names.length; i++) {
+      const box = document.createElement("div");
+      box.className = "emoji-box";
+      const emoji = emojis[i % emojis.length];
+      box.textContent = emoji;
+      box.addEventListener("click", () => handleClick(box, i));
+      grid.appendChild(box);
     }
 
-    function hideLosePopup() {
-      document.getElementById("loseOverlay").style.display = "none";
+    function handleClick(box, index) {
+      if (box.classList.contains("used")) return;
+
+      const nameIndex = getRandomNameIndex();
+      const name = shuffledNames[nameIndex];
+      shuffledNames.splice(nameIndex, 1);
+
+      box.classList.add("used");
+      box.textContent = name;
+      box.style.transition = "opacity 2s";
+      setTimeout(() => {
+        box.style.opacity = 0;
+      }, 2500);
+
+      if (shuffledNames.length === 1) {
+        setTimeout(() => showResult("الفائز هو", shuffledNames[0], "winner"), 3000);
+      } else if (shuffledNames.length > 0) {
+        setTimeout(() => showResult("خسر", name, "loser"), 1000);
+      }
     }
 
-    function showWinner(name) {
-      document.getElementById("winnerName").textContent = name;
-      document.getElementById("winOverlay").style.display = "flex";
-      document.querySelector(".restart-btn").style.display = "inline-block";
+    function getRandomNameIndex() {
+      return Math.floor(Math.random() * shuffledNames.length);
     }
 
-    function restartGame() {
-      window.location.href = "index.html";
+    function showResult(text, name, type) {
+      const overlay = document.getElementById("resultOverlay");
+      const resultText = document.getElementById("resultText");
+      const resultName = document.getElementById("resultName");
+      const retryBtn = document.getElementById("retryBtn");
+
+      resultText.textContent = text;
+      resultName.textContent = name;
+      resultName.className = type === "winner" ? "winner" : "loser";
+      retryBtn.style.display = type === "winner" ? "block" : "none";
+      overlay.style.display = "flex";
+    }
+
+    function hideOverlay() {
+      const overlay = document.getElementById("resultOverlay");
+      overlay.style.display = "none";
+    }
+
+    function restartGame(event) {
+      event.stopPropagation();
+      window.location = "index.html";
     }
   </script>
 </body>
