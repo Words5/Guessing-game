@@ -20,35 +20,40 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: 50px auto;
       background: rgba(255,255,255,0.85);
-      padding: 40px;
-      border-radius: 20px;
+      padding: 60px;
+      border-radius: 25px;
       text-align: center;
-      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      box-shadow: 0 0 30px rgba(0,0,0,0.25);
     }
 
     #itemsGrid {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 25px;
       justify-content: center;
-      margin-top: 30px;
+      margin-top: 40px;
     }
 
     .item {
-      font-size: 64px;
-      padding: 30px;
+      font-size: 80px;
+      padding: 40px;
       background: #fff;
-      border-radius: 16px;
+      border-radius: 20px;
       cursor: pointer;
       transition: transform 0.2s ease, opacity 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      min-width: 120px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .item:hover {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
 
     .fade-out {
@@ -62,14 +67,14 @@
 
     .result-box {
       background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-      padding: 80px 60px;
-      border-radius: 25px;
+      padding: 100px 70px;
+      border-radius: 30px;
       text-align: center;
-      font-size: 36px;
+      font-size: 40px;
       font-weight: bold;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.4);
       animation: popIn 0.5s ease-out;
-      min-width: 400px;
+      min-width: 450px;
       max-width: 90%;
       color: #333;
       z-index: 999;
@@ -77,12 +82,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      cursor: default;
     }
 
     .result-box span {
       display: block;
-      margin-top: 30px;
-      font-size: 48px;
+      margin-top: 40px;
+      font-size: 54px;
       font-weight: bold;
     }
 
@@ -114,14 +120,15 @@
     }
 
     #resetBtn {
-      margin-top: 40px;
-      padding: 12px 30px;
-      font-size: 20px;
+      margin-top: 50px;
+      padding: 14px 40px;
+      font-size: 22px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       background-color: #3498db;
       color: white;
       cursor: pointer;
+      display: none;
       transition: background-color 0.3s ease;
     }
 
@@ -154,7 +161,7 @@
     let remaining = [...words];
     let winner = words[Math.floor(Math.random() * words.length)];
 
-    remaining.forEach((word, index) => {
+    remaining.forEach((word) => {
       const item = document.createElement("div");
       item.className = "item";
       item.textContent = getEmoji(topic);
@@ -184,17 +191,16 @@
 
         if (word === winner) {
           showResultBox(true, word);
+          document.getElementById("resetBtn").style.display = "inline-block";
+          grid.innerHTML = ""; // ينتهي التحدي بعد الفوز
         } else {
           showResultBox(false, word);
         }
 
         setTimeout(() => {
           element.remove();
-          if (word === winner) {
-            grid.innerHTML = "";
-          }
-        }, 1800);
-      }, 1600);
+        }, 2000);
+      }, 1500);
     }
 
     function showResultBox(isWinner, name) {
@@ -203,9 +209,16 @@
       resultBox.innerHTML = `
         <div>${isWinner ? "🎉 الفائز هو" : "💔 خرج من اللعبة"}:</div>
         <span>${name}</span>
-        ${!isWinner ? "<div style='margin-top:20px;font-size:22px;'>حظاً أوفر 🌧️</div>" : ""}
+        ${!isWinner ? "<div style='margin-top:25px;font-size:24px;'>حظاً أوفر 🌧️</div>" : ""}
       `;
       document.body.appendChild(resultBox);
+
+      // إذا كانت خسارة، يتم إخفاء الرسالة بالنقر عليها
+      if (!isWinner) {
+        resultBox.addEventListener("click", () => {
+          resultBox.remove();
+        });
+      }
     }
   </script>
 </body>
