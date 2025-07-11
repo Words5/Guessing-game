@@ -173,26 +173,29 @@
       remainingItems.push(div);
 
       div.onclick = function () {
-        if (remainingWords.length === 0) return;
+  if (remainingWords.length === 0) return;
 
-        const randIndex = Math.floor(Math.random() * remainingWords.length);
-        const chosen = remainingWords.splice(randIndex, 1)[0];
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "name";
-        nameSpan.textContent = chosen;
-        div.appendChild(nameSpan);
+  const randIndex = Math.floor(Math.random() * remainingWords.length);
+  const chosen = remainingWords.splice(randIndex, 1)[0];
 
-        div.classList.add("clicked");
-        div.style.pointerEvents = "none";
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "name";
+  nameSpan.textContent = chosen;
+  div.appendChild(nameSpan);
 
-        if (remainingWords.length === 0) {
-          setTimeout(() => {
-            winnerNameSpan.textContent = chosen;
-            winnerOverlay.style.display = "flex";
-          }, 800);
-        }
-      };
+  div.style.pointerEvents = "none";
+
+  setTimeout(() => {
+    div.classList.add("clicked");
+
+    if (remainingWords.length === 0) {
+      setTimeout(() => {
+        winnerNameSpan.textContent = chosen;
+        winnerOverlay.style.display = "flex";
+      }, 800);
     }
+  }, 2500); // تأخير قبل الاختفاء
+};
 
     function restartGame() {
       sessionStorage.clear();
