@@ -16,7 +16,7 @@
     }
 
     .container {
-      max-width: 600px;
+      width: 600px;
       height: 600px;
       margin: 50px auto;
       background: rgba(255, 255, 255, 0.85);
@@ -25,17 +25,16 @@
       text-align: center;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
     }
 
     #itemsGrid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
       gap: 15px;
-      overflow-y: auto;
-      padding: 10px;
       flex-grow: 1;
+      padding: 10px;
     }
 
     .item {
@@ -135,7 +134,7 @@
   <div id="resultBox" class="resultBox">
     <h2 id="resultTitle"></h2>
     <div class="result-name" id="resultName"></div>
-    <button class="restart-btn" onclick="restartGame()">🔄 إعادة اللعب</button>
+    <button id="restartBtn" class="restart-btn" onclick="restartGame()">🔄 إعادة اللعب</button>
   </div>
 
   <script>
@@ -150,9 +149,7 @@
       "default": "default.jpg"
     };
 
-    document.body.style.backgroundImage = `url('${bgMap[topic] || "default.jpg"}')`;
-
-    const emojis = {
+    const emojiMap = {
       "fruits": "🍎",
       "planets": "🪐",
       "food": "🍔",
@@ -160,34 +157,40 @@
       "default": "❓"
     };
 
+    document.body.style.backgroundImage = `url('${bgMap[topic] || "default.jpg"}')`;
+
     const grid = document.getElementById("itemsGrid");
+    const emoji = emojiMap[topic] || "❓";
+    const shuffled = [...words];
+    shuffleArray(shuffled);
 
-    let remaining = [...words];
-    shuffleArray(remaining);
-
-    remaining.forEach(word => {
+    shuffled.forEach((word, i) => {
       const item = document.createElement("div");
       item.className = "item";
-      item.textContent = emojis[topic] || "❓";
-      item.onclick = () => handleClick(item, word);
+      item.dataset.word = word;
+      item.innerHTML = emoji;
+
+      item.onclick = () => handleClick(item);
       grid.appendChild(item);
     });
 
-    function handleClick(element, word) {
+    function handleClick(element) {
       if (element.classList.contains("used")) return;
+
+      const word = element.dataset.word;
       element.classList.add("used");
       element.textContent = word;
 
       setTimeout(() => {
         element.classList.add("fade-out");
-
         setTimeout(() => {
           element.remove();
 
-          if (grid.querySelectorAll(".item").length === 0) {
-            showResultBox(true, word);
+          const remaining = document.querySelectorAll(".item").length;
+          if (remaining === 0) {
+            showResultBox(true, word); // winner
           } else {
-            showResultBox(false, word);
+            showResultBox(false, word); // loser
           }
         }, 2000);
       }, 2000);
@@ -197,15 +200,18 @@
       const box = document.getElementById("resultBox");
       const title = document.getElementById("resultTitle");
       const name = document.getElementById("resultName");
+      const restartBtn = document.getElementById("restartBtn");
 
       box.style.display = "block";
 
       if (winner) {
         box.className = "resultBox winnerBox";
         title.textContent = "🎉 الفائز هو:";
+        restartBtn.style.display = "inline-block";
       } else {
         box.className = "resultBox loserBox";
         title.textContent = "💔 حظ أوفر، الخاسر:";
+        restartBtn.style.display = "none";
       }
 
       name.textContent = word;
