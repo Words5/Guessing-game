@@ -23,19 +23,19 @@
       justify-content: center;
     }
 
-    .title, .game-title {
-      text-align: center;
-      font-size: 32px;
-      padding: 10px 20px;
+    .game-title {
+      font-size: 42px;
       font-weight: bold;
-      color: #222;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+      margin-bottom: 30px;
     }
 
     .emoji-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 60vh;
+      width: 100%;
     }
 
     .emoji-box {
@@ -43,15 +43,17 @@
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
       gap: 20px;
       width: 600px;
-      padding: 20px;
-      background-color: rgba(255, 255, 255, 0.7);
-      border-radius: 20px;
+      max-width: 90vw;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.9); /* أقل شفافية */
+      border-radius: 24px;
       justify-items: center;
       align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
     .emoji {
-      font-size: 50px;
+      font-size: 54px;
       cursor: pointer;
       transition: transform 0.3s;
     }
@@ -124,7 +126,7 @@
   </style>
 </head>
 <body>
-  <div class="title" id="gameName"></div>
+  <div class="game-title" id="gameName"></div>
   <div class="emoji-wrapper">
     <div class="emoji-box" id="emojiBox"></div>
   </div>
@@ -135,7 +137,7 @@
     const names = JSON.parse(sessionStorage.getItem("words")) || [];
     let remainingNames = [...names];
     const emojiMap = {
-      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
       "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
       "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
       "default": ["❓"]
