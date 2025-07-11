@@ -207,7 +207,7 @@
       const popup = document.createElement("div");
       popup.className = `popup ${isWinner ? "winner" : "loser"}`;
       popup.innerHTML = isWinner
-        ? `<div>🎉 الفائز هو</div><div class="name">${content}</div><button onclick="location.reload()">🔁 إعادة اللعبة</button>`
+        ? `<div>🎉 الفائز هو</div><div class="name">${content}</div><button onclick=<button onclick="window.location.href='index.html'">🔁 إعادة اللعبة</button>
         : `<div>❌ خرج من اللعبة</div><div class="name">${content}</div><div style="font-size: 20px; margin-top: 5px;">😢 حظ أوفر</div>`;
 
       popup.addEventListener("click", () => {
