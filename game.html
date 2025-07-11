@@ -18,17 +18,16 @@
     .container {
       max-width: 800px;
       margin: 40px auto;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       padding: 30px;
       border-radius: 12px;
       text-align: center;
-      position: relative;
     }
 
     #itemsGrid {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
       margin-top: 20px;
     }
@@ -42,15 +41,9 @@
       transition: all 0.3s ease;
     }
 
-    .restart-btn {
-      margin-top: 30px;
-      padding: 12px 25px;
-      font-size: 16px;
-      cursor: pointer;
-      background: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    .item:hover {
+      background-color: #ddd;
+      transform: scale(1.05);
     }
 
     #displayBox {
@@ -68,10 +61,7 @@
     /* نافذة الفوز */
     .winner-overlay {
       position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+      top: 0; right: 0; bottom: 0; left: 0;
       background-color: rgba(0, 0, 0, 0.75);
       display: flex;
       align-items: center;
@@ -84,15 +74,22 @@
       padding: 50px;
       border-radius: 20px;
       text-align: center;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: bold;
       box-shadow: 0 0 20px gold;
       animation: popIn 0.5s ease-out;
     }
 
     @keyframes popIn {
-      from { transform: scale(0.5); opacity: 0; }
+      from { transform: scale(0.6); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-box span {
+      color: #28a745;
+      font-size: 38px;
+      display: block;
+      margin-top: 10px;
     }
 
     .winner-box button {
@@ -105,6 +102,21 @@
       border-radius: 10px;
       cursor: pointer;
     }
+
+    /* مؤثر الخسارة */
+    .loser {
+      background-color: #f44336 !important;
+      color: white;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
   </style>
 </head>
 <body>
@@ -114,10 +126,11 @@
     <div id="displayBox">👆 اضغط على عنصر لمعرفة الاسم</div>
   </div>
 
+  <!-- نافذة الفائز -->
   <div id="winnerOverlay" class="winner-overlay" style="display:none;">
     <div class="winner-box">
-      🎉 <span id="winnerName"> </span> هو الفائز!
-      <br>
+      🎉 الفائز هو:
+      <span id="winnerName"> </span>
       <button onclick="restartGame()">🔁 إعادة اللعبة</button>
     </div>
   </div>
@@ -141,7 +154,7 @@
     const winnerNameSpan = document.getElementById("winnerName");
 
     const labels = {
-      fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🥭', '🍍', '🍒', '🍑'],
+      fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🥭', '🍍', '🍒'],
       planets: ['🌍', '🪐', '🌕', '🌑', '🌖', '🌗', '🌘', '☄️'],
       food: ['🍔', '🍕', '🍟', '🍣', '🌮', '🍜', '🍩', '🍪'],
       flags: ['🇸🇦', '🇪🇬', '🇲🇦', '🇵🇸', '🇮🇶', '🇸🇾', '🇱🇧', '🇹🇳']
@@ -163,24 +176,25 @@
         const randIndex = Math.floor(Math.random() * remainingWords.length);
         const chosen = remainingWords.splice(randIndex, 1)[0];
         div.textContent = chosen;
-        div.style.backgroundColor = "#c8e6c9";
-        div.style.pointerEvents = "none";
 
-        displayBox.textContent = chosen;
-
-        setTimeout(() => {
-          div.style.opacity = 0.5;
-          div.style.transform = "scale(0.9)";
-          remainingItems = remainingItems.filter(e => e !== div);
-
-          if (remainingItems.length === 1) {
-            // الفائز
+        // آخر عنصر هو الفائز
+        if (remainingWords.length === 0) {
+          div.style.backgroundColor = "#4caf50";
+          div.style.color = "white";
+          displayBox.textContent = `🎉 ${chosen}`;
+          winnerNameSpan.textContent = chosen;
+          setTimeout(() => {
             gameOver = true;
-            const winner = remainingWords[0];
-            winnerNameSpan.textContent = winner;
             winnerOverlay.style.display = "flex";
-          }
-        }, 500);
+          }, 500);
+        } else {
+          div.classList.add("loser");
+          displayBox.textContent = chosen;
+        }
+
+        div.style.pointerEvents = "none";
+        div.style.opacity = 0.8;
+        remainingItems = remainingItems.filter(e => e !== div);
       };
 
       grid.appendChild(div);
