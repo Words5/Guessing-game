@@ -15,9 +15,9 @@
       transition: background-image 0.8s ease-in-out;
     }
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 50px auto;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.85);
       padding: 20px;
       border-radius: 12px;
       text-align: center;
@@ -30,23 +30,24 @@
       margin-top: 20px;
     }
     .item {
-      font-size: 24px;
-      padding: 10px 20px;
+      font-size: 28px;
+      padding: 15px 25px;
       background: #eee;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>اختر العنصر الصحيح</h2>
+    <h2>اختر عنصرًا لعرض الاسم</h2>
     <div id="itemsGrid"></div>
   </div>
 
   <script>
     const topic = sessionStorage.getItem("topic") || "default";
-    const words = JSON.parse(sessionStorage.getItem("words")) || [];
+    let words = JSON.parse(sessionStorage.getItem("words")) || [];
 
     const bgMap = {
       "fruits": "fruits.jpg",
@@ -58,12 +59,47 @@
     document.body.style.backgroundImage = `url('${bgMap[topic] || 'default.jpg'}')`;
 
     const grid = document.getElementById("itemsGrid");
-    words.forEach(word => {
+
+    const labels = {
+      fruits: ['🍎','🍌','🍓','🍇','🍉','🥭','🍍','🍒','🍑'],
+      planets: ['🌍','🪐','🌕','🌑','🌖','🌗','🌘','☄️'],
+      food: ['🍔','🍕','🍟','🍣','🌮','🍜','🍩','🍪'],
+      flags: ['🇸🇦','🇪🇬','🇲🇦','🇵🇸','🇮🇶','🇸🇾','🇱🇧','🇹🇳']
+    };
+
+    let topicIcons = labels[topic] || ['❓'];
+    let remainingWords = [...words];
+    let remainingItems = [];
+
+    for (let i = 0; i < words.length; i++) {
       const div = document.createElement("div");
       div.className = "item";
-      div.textContent = word;
+      div.textContent = topicIcons[i % topicIcons.length];
+      div.onclick = function () {
+        if (remainingWords.length === 0) return;
+
+        const randIndex = Math.floor(Math.random() * remainingWords.length);
+        const chosen = remainingWords.splice(randIndex, 1)[0];
+        div.textContent = chosen;
+        div.style.backgroundColor = "#c8e6c9";
+        div.style.pointerEvents = "none";
+
+        setTimeout(() => {
+          div.style.opacity = 0.5;
+          div.style.transform = "scale(0.9)";
+          div.style.transition = "all 0.3s";
+          remainingItems = remainingItems.filter(e => e !== div);
+
+          if (remainingItems.length === 1) {
+            remainingItems[0].style.backgroundColor = "#ffeb3b";
+            remainingItems[0].textContent = "🎉 الفائز: " + remainingWords[0];
+          }
+        }, 1000);
+      };
+
       grid.appendChild(div);
-    });
+      remainingItems.push(div);
+    }
   </script>
 </body>
 </html>
