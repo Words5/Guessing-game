@@ -4,16 +4,52 @@
   <meta charset="UTF-8">
   <title>اختر الفئة</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
-    button { margin: 10px; padding: 15px 25px; font-size: 18px; cursor: pointer; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+      min-height: 100vh;
+      background-image: url('img/default.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 30px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    button {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 <body>
-  <h1>اختر فئة اللعبة</h1>
-  <button onclick="startGame('fruits')">🍎 فواكه</button>
-  <button onclick="startGame('planets')">🪐 كواكب</button>
-  <button onclick="startGame('food')">🍔 أكل</button>
-  <button onclick="startGame('flags')">🏳️ أعلام</button>
+  <div class="overlay">
+    <h1>اختر فئة اللعبة</h1>
+    <button onclick="startGame('fruits')">🍎 فواكه</button>
+    <button onclick="startGame('planets')">🪐 كواكب</button>
+    <button onclick="startGame('food')">🍔 أكل</button>
+    <button onclick="startGame('flags')">🏳️ أعلام</button>
+  </div>
 
   <script>
     function startGame(topic) {
