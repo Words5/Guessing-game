@@ -38,22 +38,16 @@
     }
 
     .item {
-      font-size: 80px;
-      padding: 40px;
+      font-size: 70px;
+      width: 140px;
+      height: 140px;
+      line-height: 140px;
       background: #fff;
       border-radius: 20px;
       cursor: pointer;
-      transition: transform 0.2s ease, opacity 0.3s ease;
+      transition: opacity 0.3s ease;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-      min-width: 120px;
-      min-height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .item:hover {
-      transform: scale(1.08);
+      text-align: center;
     }
 
     .fade-out {
@@ -119,8 +113,8 @@
       100% { transform: translateY(0) scale(1); }
     }
 
-    #resetBtn {
-      margin-top: 50px;
+    .restart-btn {
+      margin-top: 40px;
       padding: 14px 40px;
       font-size: 22px;
       border: none;
@@ -128,11 +122,10 @@
       background-color: #3498db;
       color: white;
       cursor: pointer;
-      display: none;
       transition: background-color 0.3s ease;
     }
 
-    #resetBtn:hover {
+    .restart-btn:hover {
       background-color: #2980b9;
     }
   </style>
@@ -141,7 +134,6 @@
   <div class="container">
     <h2>اختر الإيموجي الصحيح</h2>
     <div id="itemsGrid"></div>
-    <button id="resetBtn" onclick="location.reload()">🔁 إعادة اللعبة</button>
   </div>
 
   <script>
@@ -191,8 +183,7 @@
 
         if (word === winner) {
           showResultBox(true, word);
-          document.getElementById("resetBtn").style.display = "inline-block";
-          grid.innerHTML = ""; // ينتهي التحدي بعد الفوز
+          grid.innerHTML = ""; // اللعبة تنتهي
         } else {
           showResultBox(false, word);
         }
@@ -210,10 +201,10 @@
         <div>${isWinner ? "🎉 الفائز هو" : "💔 خرج من اللعبة"}:</div>
         <span>${name}</span>
         ${!isWinner ? "<div style='margin-top:25px;font-size:24px;'>حظاً أوفر 🌧️</div>" : ""}
+        ${isWinner ? "<button class='restart-btn' onclick='location.reload()'>🔁 إعادة اللعبة</button>" : ""}
       `;
       document.body.appendChild(resultBox);
 
-      // إذا كانت خسارة، يتم إخفاء الرسالة بالنقر عليها
       if (!isWinner) {
         resultBox.addEventListener("click", () => {
           resultBox.remove();
