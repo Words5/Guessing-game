@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>لعبة التخمين</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -12,200 +16,198 @@
       background-position: center;
       background-repeat: no-repeat;
       direction: rtl;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     .title {
       text-align: center;
-      font-size: 40px;
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
       color: white;
-      margin-top: 20px;
-      text-shadow: 2px 2px 4px #000;
     }
 
-    .emoji-grid-container {
+    .game-box {
       width: 80%;
       max-width: 900px;
-      margin: 30px auto;
-      padding: 30px;
+      min-height: 400px;
+      margin: 40px auto;
+      padding: 20px;
       background: rgba(255, 255, 255, 0.85);
-      border-radius: 16px;
+      border-radius: 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
       gap: 20px;
-      min-height: 400px;
     }
 
-    .emoji-box {
+    .emoji-button {
       font-size: 48px;
+      padding: 20px;
       width: 100px;
       height: 100px;
-      background: #fff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background-color: #fff;
+      border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
     }
 
-    .emoji-box:hover {
+    .emoji-button:hover {
       transform: scale(1.1);
+    }
+
+    .name-reveal {
+      font-size: 24px;
+      color: #222;
+      text-align: center;
+      margin-top: 10px;
+      opacity: 1;
+      transition: opacity 2s ease-out;
     }
 
     .overlay {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .result-box {
-      background: #fff;
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-
-    .result-box h2 {
-      font-size: 36px;
-      margin-bottom: 20px;
-    }
-
-    .winner {
-      color: #d4af37; /* ذهبي */
-      font-size: 40px;
-      font-weight: bold;
-    }
-
-    .loser {
-      color: crimson;
-      font-size: 36px;
-      font-weight: bold;
-    }
-
-    .retry-btn {
-      margin-top: 25px;
-      padding: 12px 25px;
-      font-size: 18px;
-      background-color: #333;
+      background-color: rgba(0, 0, 0, 0.8);
       color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: bold;
+      z-index: 9999;
+    }
+
+    .overlay .name {
+      color: gold;
+      font-size: 48px;
+      margin: 20px 0;
+    }
+
+    .overlay button {
+      padding: 15px 30px;
+      font-size: 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      background-color: #fff;
+      color: #000;
       cursor: pointer;
     }
 
-    .retry-btn:hover {
-      background-color: #555;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1 class="title" id="gameTitle">لعبة</h1>
 
-  <div class="emoji-grid-container" id="emojiGrid"></div>
+  <div class="title" id="gameTitle">لعبة التخمين</div>
+  <div class="game-box" id="emojiContainer"></div>
 
-  <div class="overlay" id="resultOverlay" style="display: none;" onclick="hideOverlay()">
-    <div class="result-box" id="resultBox">
-      <h2 id="resultText">الفائز هو</h2>
-      <div id="resultName" class="winner"></div>
-      <button class="retry-btn" id="retryBtn" onclick="restartGame(event)">إعادة اللعبة</button>
-    </div>
+  <div class="overlay hidden" id="overlay" onclick="hideOverlay()">
+    <div id="overlayText"></div>
+    <div class="name" id="overlayName"></div>
+    <button id="restartBtn" onclick="restartGame(event)">🔁 إعادة اللعبة</button>
   </div>
 
   <script>
     const topic = sessionStorage.getItem("topic") || "default";
-    const names = JSON.parse(sessionStorage.getItem("words")) || [];
+    const words = JSON.parse(sessionStorage.getItem("words")) || [];
+    document.body.style.backgroundImage = `url('${topic}.jpg')`;
 
     const emojiMap = {
-      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
       "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
       "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
       "default": ["❓"]
     };
 
-    const titleMap = {
+    const topicNames = {
       "fruits": "🍎 حرب الفواكه",
       "food": "🍔 حرب الأكل",
-      "flags": "🏳️ حرب الأعلام",
-      "default": "❓ حرب"
+      "flags": "🏳️‍🌈 حرب الأعلام",
+      "default": "لعبة التخمين"
     };
 
-    const emojis = [...emojiMap[topic]];
-    const shuffledNames = [...names];
-    const usedIndices = new Set();
+    document.getElementById("gameTitle").textContent = topicNames[topic] || topicNames.default;
 
-    document.getElementById("gameTitle").textContent = titleMap[topic] || "لعبة";
+    const emojiContainer = document.getElementById("emojiContainer");
+    const overlay = document.getElementById("overlay");
+    const overlayText = document.getElementById("overlayText");
+    const overlayName = document.getElementById("overlayName");
+    const restartBtn = document.getElementById("restartBtn");
 
-    const grid = document.getElementById("emojiGrid");
+    let remaining = [...words];
+    let emojis = [...emojiMap[topic]];
+    emojis = shuffle(emojis).slice(0, remaining.length);
 
-    for (let i = 0; i < names.length; i++) {
-      const box = document.createElement("div");
-      box.className = "emoji-box";
-      const emoji = emojis[i % emojis.length];
-      box.textContent = emoji;
-      box.addEventListener("click", () => handleClick(box, i));
-      grid.appendChild(box);
+    renderEmojis();
+
+    function renderEmojis() {
+      emojiContainer.innerHTML = "";
+      remaining.forEach((name, i) => {
+        const btn = document.createElement("div");
+        btn.className = "emoji-button";
+        btn.innerHTML = emojis[i];
+        btn.onclick = () => revealName(i);
+        emojiContainer.appendChild(btn);
+      });
     }
 
-    function handleClick(box, index) {
-      if (box.classList.contains("used")) return;
+    function revealName(index) {
+      const name = remaining[index];
+      const btns = document.getElementsByClassName("emoji-button");
+      const btn = btns[index];
 
-      const nameIndex = getRandomNameIndex();
-      const name = shuffledNames[nameIndex];
-      shuffledNames.splice(nameIndex, 1);
+      btn.innerHTML = `<div class="name-reveal">${name}</div>`;
+      btn.style.pointerEvents = "none";
 
-      box.classList.add("used");
-      box.textContent = name;
-      box.style.transition = "opacity 2s";
       setTimeout(() => {
-        box.style.opacity = 0;
-      }, 2500);
+        btn.remove();
+        remaining.splice(index, 1);
+        emojis.splice(index, 1);
 
-      if (shuffledNames.length === 1) {
-        setTimeout(() => showResult("الفائز هو", shuffledNames[0], "winner"), 3000);
-      } else if (shuffledNames.length > 0) {
-        setTimeout(() => showResult("خسر", name, "loser"), 1000);
-      }
+        if (remaining.length === 1) {
+          showOverlay("🎉 الفائز هو", remaining[0]);
+        } else {
+          showOverlay("🚫 خرج من اللعبة", name, false);
+        }
+      }, 3000);
     }
 
-    function getRandomNameIndex() {
-      return Math.floor(Math.random() * shuffledNames.length);
-    }
-
-    function showResult(text, name, type) {
-      const overlay = document.getElementById("resultOverlay");
-      const resultText = document.getElementById("resultText");
-      const resultName = document.getElementById("resultName");
-      const retryBtn = document.getElementById("retryBtn");
-
-      resultText.textContent = text;
-      resultName.textContent = name;
-      resultName.className = type === "winner" ? "winner" : "loser";
-      retryBtn.style.display = type === "winner" ? "block" : "none";
-      overlay.style.display = "flex";
+    function showOverlay(message, name, showRestart = false) {
+      overlay.classList.remove("hidden");
+      overlayText.textContent = message;
+      overlayName.textContent = name;
+      restartBtn.style.display = showRestart ? "block" : "none";
     }
 
     function hideOverlay() {
-      const overlay = document.getElementById("resultOverlay");
-      overlay.style.display = "none";
+      if (remaining.length === 1) return;
+      overlay.classList.add("hidden");
     }
 
     function restartGame(event) {
       event.stopPropagation();
+      sessionStorage.clear();
       window.location = "index.html";
     }
+
+    function shuffle(arr) {
+      let copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
   </script>
+
 </body>
 </html>
