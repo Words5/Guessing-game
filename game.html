@@ -14,16 +14,14 @@
       background-repeat: no-repeat;
       transition: background-image 0.8s ease-in-out;
     }
-
     .container {
       max-width: 500px;
       margin: 50px auto;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255,255,255,0.8);
       padding: 20px;
       border-radius: 12px;
       text-align: center;
     }
-
     #itemsGrid {
       display: flex;
       flex-wrap: wrap;
@@ -31,18 +29,12 @@
       justify-content: center;
       margin-top: 20px;
     }
-
     .item {
       font-size: 24px;
       padding: 10px 20px;
       background: #eee;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .item:hover {
-      background: #ddd;
     }
   </style>
 </head>
@@ -57,14 +49,13 @@
     const words = JSON.parse(sessionStorage.getItem("words")) || [];
 
     const bgMap = {
-      "fruits": "img/fruits.jpg",
-      "planets": "img/planets.jpg",
-      "food": "img/food.jpg",
-      "flags": "img/flags.jpg"
+      "fruits": "fruits.jpg",
+      "planets": "planets.jpg",
+      "food": "food.jpg",
+      "flags": "flags.jpg"
     };
 
-    // الخلفية حسب الموضوع، وإذا ما في صورة يختار صورة افتراضية
-    document.body.style.backgroundImage = `url('${bgMap[topic] || 'img/default.jpg'}')`;
+    document.body.style.backgroundImage = `url('${bgMap[topic] || 'default.jpg'}')`;
 
     const grid = document.getElementById("itemsGrid");
     words.forEach(word => {
