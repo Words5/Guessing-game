@@ -119,7 +119,6 @@
       border-radius: 10px;
       cursor: pointer;
     }
-
   </style>
 </head>
 <body>
@@ -173,29 +172,32 @@
       remainingItems.push(div);
 
       div.onclick = function () {
-  if (remainingWords.length === 0) return;
+        if (remainingWords.length === 0) return;
 
-  const randIndex = Math.floor(Math.random() * remainingWords.length);
-  const chosen = remainingWords.splice(randIndex, 1)[0];
+        const randIndex = Math.floor(Math.random() * remainingWords.length);
+        const chosen = remainingWords.splice(randIndex, 1)[0];
 
-  const nameSpan = document.createElement("span");
-  nameSpan.className = "name";
-  nameSpan.textContent = chosen;
-  div.appendChild(nameSpan);
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "name";
+        nameSpan.textContent = chosen;
+        div.appendChild(nameSpan);
 
-  div.style.pointerEvents = "none";
+        div.style.pointerEvents = "none";
 
-  setTimeout(() => {
-    div.classList.add("clicked");
+        // ⏱ تأخير قبل الاختفاء
+        setTimeout(() => {
+          div.classList.add("clicked");
 
-    if (remainingWords.length === 0) {
-      setTimeout(() => {
-        winnerNameSpan.textContent = chosen;
-        winnerOverlay.style.display = "flex";
-      }, 800);
+          // إذا انتهت اللعبة، أظهر الفائز
+          if (remainingWords.length === 0) {
+            setTimeout(() => {
+              winnerNameSpan.textContent = chosen;
+              winnerOverlay.style.display = "flex";
+            }, 800);
+          }
+        }, 2500);
+      };
     }
-  }, 2500); // تأخير قبل الاختفاء
-};
 
     function restartGame() {
       sessionStorage.clear();
