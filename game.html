@@ -53,7 +53,7 @@
     .nameReveal {
       font-size: 28px;
       color: #444;
-      animation: fadeOut 2s forwards;
+      animation: fadeOut 2.5s forwards;
     }
 
     @keyframes fadeOut {
@@ -129,10 +129,10 @@
     };
 
     const emojiMap = {
-      "fruits": "🍎",
-      "food": "🍔",
-      "flags": "🏳️",
-      "default": "❓"
+      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+      "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
+      "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
+      "default": ["❓"]
     };
 
     const titleMap = {
@@ -148,42 +148,21 @@
 
     const grid = document.getElementById("itemsGrid");
 
-    function renderGrid() {
-      grid.innerHTML = "";
-      words.forEach((_, i) => {
-        const div = document.createElement("div");
-   const emojiMap = {
-     "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
-     "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
-     "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
-     "default": ["❓"]
-   };
+    let assignedEmojis = [];
 
-
-    const titleMap = {
-      "fruits": { text: "🍎 حرب الفواكه", color: "#e74c3c" },
-      "food": { text: "🍔 حرب الأكل", color: "#f39c12" },
-      "flags": { text: "🏳️ حرب الأعلام", color: "#2980b9" },
-      "default": { text: "لعبة التخمين", color: "#555" }
-    };
-
-    document.body.style.backgroundImage = `url('${bgMap[topic] || bgMap['default']}')`;
-    document.getElementById("title").textContent = titleMap[topic]?.text || "اللعبة";
-    document.getElementById("title").style.backgroundColor = titleMap[topic]?.color || "#444";
-
-    const grid = document.getElementById("itemsGrid");
+    function getRandomEmoji() {
+      const list = emojiMap[topic] || emojiMap["default"];
+      return list[Math.floor(Math.random() * list.length)];
+    }
 
     function renderGrid() {
       grid.innerHTML = "";
+      assignedEmojis = words.map(() => getRandomEmoji());
+
       words.forEach((_, i) => {
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML = emojiMap[topic] || "❓";
-        div.onclick = () => handleClick(div, i);
-        grid.appendChild(div);
-      });
-    }  div.className = "item";
-        div.innerHTML = emojiMap[topic] || "❓";
+        div.innerHTML = assignedEmojis[i];
         div.onclick = () => handleClick(div, i);
         grid.appendChild(div);
       });
@@ -201,11 +180,11 @@
         words.splice(index, 1);
 
         if (words.length === 1) {
-          showResult("الفائز هو 🎉", words[0], "winner", true);
+          showResult("🎉 الفائز هو", words[0], "winner", true);
         } else if (words.length > 1) {
-          showResult("حظ أوفر 😢", name, "loser", false);
+          showResult("😢 حظ أوفر", name, "loser", false);
         }
-      }, 2200);
+      }, 2500);
     }
 
     function showResult(title, name, className, isWinner) {
