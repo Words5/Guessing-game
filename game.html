@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -58,10 +57,10 @@
     }
 
     .item .name {
-      font-size: 22px;
+      font-size: 24px;
       color: #222;
       margin-top: 5px;
-      opacity: 0;
+      opacity: 1;
       transition: opacity 0.3s;
     }
 
@@ -83,13 +82,14 @@
 
     .result-box {
       background: #fff;
-      padding: 50px;
+      padding: 60px 40px;
       border-radius: 20px;
       text-align: center;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
-      box-shadow: 0 0 20px #555;
+      box-shadow: 0 0 30px #555;
       animation: popIn 0.5s ease-out;
+      min-width: 300px;
     }
 
     @keyframes popIn {
@@ -99,13 +99,14 @@
 
     .result-box span {
       display: block;
-      margin-top: 10px;
+      margin-top: 20px;
+      font-size: 42px;
     }
 
     .result-box button {
       margin-top: 30px;
       padding: 12px 25px;
-      font-size: 18px;
+      font-size: 20px;
       background: #007bff;
       color: white;
       border: none;
@@ -113,8 +114,8 @@
       cursor: pointer;
     }
 
-    .win span { color: #28a745; font-size: 38px; }
-    .lose span { color: #dc3545; font-size: 28px; }
+    .win span { color: #28a745; }
+    .lose span { color: #dc3545; }
   </style>
 </head>
 <body>
@@ -131,7 +132,7 @@
     </div>
   </div>
 
-  <div id="loserOverlay" class="overlay" style="display:none;">
+  <div id="loserOverlay" class="overlay" style="display:none;" onclick="hideLoser()">
     <div class="result-box lose">
       ❌ خسر:
       <span id="loserName"></span>
@@ -185,7 +186,6 @@
         const nameSpan = document.createElement("div");
         nameSpan.className = "name";
         nameSpan.textContent = chosen;
-        nameSpan.style.opacity = "1";
         div.appendChild(nameSpan);
 
         div.style.pointerEvents = "none";
@@ -202,18 +202,19 @@
             setTimeout(() => {
               loserNameSpan.textContent = chosen;
               loserOverlay.style.display = "flex";
-              setTimeout(() => {
-                loserOverlay.style.display = "none";
-              }, 1800);
             }, 800);
           }
-        }, 2500);
+        }, 2000);
       };
     }
 
     function restartGame() {
       sessionStorage.clear();
       window.location = 'index.html';
+    }
+
+    function hideLoser() {
+      loserOverlay.style.display = "none";
     }
   </script>
 </body>
