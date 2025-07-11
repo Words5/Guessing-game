@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>لعبة التخمين</title>
   <style>
     body {
@@ -14,134 +14,91 @@
       background-repeat: no-repeat;
       transition: background-image 0.8s ease-in-out;
     }
-
     .container {
-      width: 600px;
-      height: 600px;
-      margin: 50px auto;
-      background: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      margin: 40px auto;
+      background: rgba(255,255,255,0.7);
       padding: 30px;
-      border-radius: 20px;
+      border-radius: 16px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
     }
-
-    #gameTitle {
+    .title {
       font-size: 32px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       font-weight: bold;
     }
-
     #itemsGrid {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
       gap: 15px;
-      flex-grow: 1;
-      padding: 10px;
+      justify-content: center;
+      margin-top: 20px;
     }
-
     .item {
-      font-size: 48px;
       width: 100px;
       height: 100px;
-      background: #fafafa;
+      background: #ffffffcc;
+      font-size: 40px;
       border-radius: 16px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    .item:hover {
+      transform: scale(1.1);
     }
 
-    .item.used {
-      background: #ddd;
-      cursor: default;
-    }
-
-    .fade-out {
-      opacity: 0;
-      transform: scale(0.8);
-      transition: opacity 2s ease, transform 2s ease;
-    }
-
-    .resultBox {
-      display: none;
-      padding: 30px;
-      border-radius: 20px;
+    .result-box {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 28px;
+      background: rgba(255,255,255,0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+      z-index: 999;
       text-align: center;
-      z-index: 1000;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-      animation: popIn 0.6s ease;
-      max-width: 90%;
+      display: none;
     }
-
-    .winnerBox {
-      background: #d1f5d3;
-      color: #1e7e34;
+    .result-box h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
     }
-
-    .loserBox {
-      background: #ffe1e1;
-      color: #c82333;
-    }
-
-    .resultBox h2 {
-      margin-top: 0;
-    }
-
-    .result-name {
+    .winner {
+      color: green;
       font-weight: bold;
-      color: #000;
       font-size: 36px;
-      margin-top: 15px;
     }
-
-    .restart-btn {
+    .loser {
+      color: #c0392b;
+      font-size: 30px;
+    }
+    #restartBtn {
       margin-top: 20px;
-      padding: 10px 30px;
-      font-size: 20px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      background: #333;
+      padding: 12px 25px;
+      font-size: 18px;
+      background: #3498db;
       color: white;
-    }
-
-    .restart-btn:hover {
-      background: #000;
-    }
-
-    @keyframes popIn {
-      0% {
-        transform: translate(-50%, -50%) scale(0.5);
-        opacity: 0;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div id="gameTitle">اسم اللعبة</div>
+    <div id="gameTitle" class="title">لعبة التخمين</div>
     <div id="itemsGrid"></div>
   </div>
 
-  <div id="resultBox" class="resultBox">
-    <h2 id="resultTitle"></h2>
-    <div class="result-name" id="resultName"></div>
-    <button id="restartBtn" class="restart-btn" onclick="restartGame()">🔄 إعادة اللعب</button>
+  <div id="resultBox" class="result-box" onclick="hideResult()">
+    <h2 id="resultText"></h2>
+    <div id="resultName"></div>
+    <button id="restartBtn" onclick="restartGame()">🔁 إعادة اللعبة</button>
   </div>
 
   <script>
@@ -152,105 +109,90 @@
       "fruits": "fruits.jpg",
       "planets": "planets.jpg",
       "food": "food.jpg",
-      "flags": "flags.jpg",
-      "default": "default.jpg"
+      "flags": "flags.jpg"
     };
 
     const emojiMap = {
-      "fruits": "🍎",
-      "planets": "🪐",
-      "food": "🍔",
-      "flags": "🏳️",
-      "default": "❓"
+  "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+  "planets": ["🪐", "🌍", "🌕", "🌌", "☄️", "🌙", "🔭", "☀️", "⭐", "☁️"],
+  "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
+  "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
+  "default": ["❓"]
     };
 
-    const titleMap = {
-      "fruits": { text: "🍎 حرب الفواكه", color: "#d62828" },
-      "planets": { text: "🪐 حرب الكواكب", color: "#6a4c93" },
-      "food": { text: "🍔 حرب الأكل", color: "#f77f00" },
-      "flags": { text: "🏳️ حرب الأعلام", color: "#003049" },
-      "default": { text: "❓ حرب التخمين", color: "#222" }
-    };
-
-    document.body.style.backgroundImage = `url('${bgMap[topic] || "default.jpg"}')`;
-
-    const gameTitle = document.getElementById("gameTitle");
-    gameTitle.textContent = titleMap[topic]?.text || titleMap["default"].text;
-    gameTitle.style.color = titleMap[topic]?.color || titleMap["default"].color;
+    document.body.style.backgroundImage = `url('${bgMap[topic] || 'img/bg_default.jpg'}')`;
 
     const grid = document.getElementById("itemsGrid");
-    const emoji = emojiMap[topic] || "❓";
-    const shuffled = [...words];
-    shuffleArray(shuffled);
+    const shuffled = [...words].sort(() => 0.5 - Math.random());
+    const target = shuffled[shuffled.length - 1];
+    let remainingItems = shuffled.length;
 
     shuffled.forEach((word) => {
       const item = document.createElement("div");
       item.className = "item";
       item.dataset.word = word;
-      item.innerHTML = emoji;
+
+      const emojiList = emojiMap[topic] || emojiMap["default"];
+      const randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+      item.innerHTML = randomEmoji;
 
       item.onclick = () => handleClick(item);
       grid.appendChild(item);
     });
 
     function handleClick(element) {
-      if (element.classList.contains("used")) return;
-
       const word = element.dataset.word;
-      element.classList.add("used");
-      element.textContent = word;
+      element.innerHTML = word;
+      element.style.pointerEvents = "none";
+      element.style.opacity = 0.9;
 
-      setTimeout(() => {
-        element.classList.add("fade-out");
-        setTimeout(() => {
-          element.remove();
-
-          const remaining = document.querySelectorAll(".item").length;
-          if (remaining === 0) {
-            showResultBox(true, word); // winner
-          } else {
-            showResultBox(false, word); // loser
-          }
-        }, 2000);
-      }, 2000);
-    }
-
-    function showResultBox(winner, word) {
-      const box = document.getElementById("resultBox");
-      const title = document.getElementById("resultTitle");
-      const name = document.getElementById("resultName");
-      const restartBtn = document.getElementById("restartBtn");
-
-      box.style.display = "block";
-
-      if (winner) {
-        box.className = "resultBox winnerBox";
-        title.textContent = "🎉 الفائز هو:";
-        restartBtn.style.display = "inline-block";
-        box.onclick = null;
+      if (word === target) {
+        showResult("الفائز هو 🎉", word, true);
       } else {
-        box.className = "resultBox loserBox";
-        title.textContent = "💔 حظ أوفر، الخاسر:";
-        restartBtn.style.display = "none";
-        box.onclick = () => {
-          box.style.display = "none";
-          box.onclick = null;
-        };
+        showResult("حظ أوفر 😢", word, false);
       }
 
-      name.textContent = word;
+      remainingItems--;
+    }
+
+    function showResult(title, name, isWinner) {
+      const box = document.getElementById("resultBox");
+      const text = document.getElementById("resultText");
+      const nameDiv = document.getElementById("resultName");
+      const restartBtn = document.getElementById("restartBtn");
+
+      text.textContent = title;
+      nameDiv.textContent = name;
+      nameDiv.className = isWinner ? "winner" : "loser";
+
+      box.style.display = "block";
+      restartBtn.style.display = isWinner ? "inline-block" : "none";
+
+      if (!isWinner && remainingItems > 1) {
+        setTimeout(() => {
+          box.style.display = "none";
+        }, 2000);
+      }
+    }
+
+    function hideResult() {
+      const box = document.getElementById("resultBox");
+      box.style.display = "none";
     }
 
     function restartGame() {
       location.reload();
     }
 
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
+    // Show game title based on category
+    const titles = {
+      "fruits": "🍎 حرب الفواكه",
+      "planets": "🪐 حرب الكواكب",
+      "food": "🍔 حرب الأكل",
+      "flags": "🏳️ حرب الأعلام",
+      "default": "❓ لعبة التخمين"
+    };
+    document.getElementById("gameTitle").textContent = titles[topic] || titles["default"];
   </script>
 </body>
 </html>
