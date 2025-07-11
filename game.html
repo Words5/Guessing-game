@@ -16,12 +16,13 @@
     }
 
     .container {
-      max-width: 700px;
-      margin: 50px auto;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 20px;
+      max-width: 800px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
       border-radius: 12px;
       text-align: center;
+      position: relative;
     }
 
     #itemsGrid {
@@ -33,8 +34,8 @@
     }
 
     .item {
-      font-size: 28px;
-      padding: 15px 25px;
+      font-size: 30px;
+      padding: 18px 28px;
       background: #eee;
       border-radius: 10px;
       cursor: pointer;
@@ -53,26 +54,56 @@
     }
 
     #displayBox {
-      margin-top: 30px;
-      padding: 30px;
-      font-size: 36px;
+      margin-top: 40px;
+      padding: 40px;
+      font-size: 48px;
       font-weight: bold;
-      background-color: #ffffffc7;
-      border: 3px solid #1976d2;
+      background-color: #ffffffd2;
+      border: 4px solid #1976d2;
       border-radius: 15px;
-      min-height: 80px;
+      min-height: 100px;
       transition: all 0.4s ease;
     }
 
-    .winner {
-      background: linear-gradient(90deg, #ffeb3b, #ffe082);
-      color: #000;
-      animation: flash 1s infinite alternate;
+    /* نافذة الفوز */
+    .winner-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
 
-    @keyframes flash {
-      0% { box-shadow: 0 0 10px #fdd835; }
-      100% { box-shadow: 0 0 20px #ffb300; }
+    .winner-box {
+      background: #fff;
+      padding: 50px;
+      border-radius: 20px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      box-shadow: 0 0 20px gold;
+      animation: popIn 0.5s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-box button {
+      margin-top: 30px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -81,7 +112,14 @@
     <h2>اختر عنصرًا لعرض الاسم</h2>
     <div id="itemsGrid"></div>
     <div id="displayBox">👆 اضغط على عنصر لمعرفة الاسم</div>
-    <button class="restart-btn" onclick="restartGame()">🔁 إعادة اللعبة</button>
+  </div>
+
+  <div id="winnerOverlay" class="winner-overlay" style="display:none;">
+    <div class="winner-box">
+      🎉 <span id="winnerName"> </span> هو الفائز!
+      <br>
+      <button onclick="restartGame()">🔁 إعادة اللعبة</button>
+    </div>
   </div>
 
   <script>
@@ -99,6 +137,8 @@
 
     const grid = document.getElementById("itemsGrid");
     const displayBox = document.getElementById("displayBox");
+    const winnerOverlay = document.getElementById("winnerOverlay");
+    const winnerNameSpan = document.getElementById("winnerName");
 
     const labels = {
       fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🥭', '🍍', '🍒', '🍑'],
@@ -111,12 +151,14 @@
     let remainingWords = [...words];
     let remainingItems = [];
 
+    let gameOver = false;
+
     for (let i = 0; i < words.length; i++) {
       const div = document.createElement("div");
       div.className = "item";
       div.textContent = topicIcons[i % topicIcons.length];
       div.onclick = function () {
-        if (remainingWords.length === 0) return;
+        if (remainingWords.length === 0 || gameOver) return;
 
         const randIndex = Math.floor(Math.random() * remainingWords.length);
         const chosen = remainingWords.splice(randIndex, 1)[0];
@@ -129,15 +171,14 @@
         setTimeout(() => {
           div.style.opacity = 0.5;
           div.style.transform = "scale(0.9)";
-          div.style.transition = "all 0.3s";
           remainingItems = remainingItems.filter(e => e !== div);
 
           if (remainingItems.length === 1) {
-            const winnerName = remainingWords[0];
-            displayBox.textContent = `🎉 الفائز: ${winnerName}`;
-            displayBox.classList.add("winner");
-            remainingItems[0].style.backgroundColor = "#ffeb3b";
-            remainingItems[0].textContent = "🏆";
+            // الفائز
+            gameOver = true;
+            const winner = remainingWords[0];
+            winnerNameSpan.textContent = winner;
+            winnerOverlay.style.display = "flex";
           }
         }, 500);
       };
