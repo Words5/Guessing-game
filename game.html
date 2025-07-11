@@ -81,15 +81,16 @@
     }
 
     .result-box {
-      background: #fff;
+      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
       padding: 60px 40px;
       border-radius: 20px;
       text-align: center;
       font-size: 32px;
       font-weight: bold;
-      box-shadow: 0 0 30px #555;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
       animation: popIn 0.5s ease-out;
       min-width: 300px;
+      color: #333;
     }
 
     @keyframes popIn {
@@ -114,8 +115,8 @@
       cursor: pointer;
     }
 
-    .win span { color: #28a745; }
-    .lose span { color: #dc3545; }
+    .win span { color: #2ecc71; }
+    .lose span { color: #e74c3c; }
   </style>
 </head>
 <body>
@@ -134,7 +135,7 @@
 
   <div id="loserOverlay" class="overlay" style="display:none;" onclick="hideLoser()">
     <div class="result-box lose">
-      ❌ خسر:
+      ❌
       <span id="loserName"></span>
     </div>
   </div>
@@ -175,7 +176,7 @@
       grid.appendChild(div);
 
       div.onclick = function () {
-        if (remainingWords.length === 0) return;
+        if (remainingWords.length === 0 || div.classList.contains('clicked')) return;
 
         const randIndex = Math.floor(Math.random() * remainingWords.length);
         const chosen = remainingWords.splice(randIndex, 1)[0];
@@ -200,7 +201,7 @@
             }, 800);
           } else {
             setTimeout(() => {
-              loserNameSpan.textContent = chosen;
+              loserNameSpan.textContent = `${chosen} - حظاً أوفر!`;
               loserOverlay.style.display = "flex";
             }, 800);
           }
