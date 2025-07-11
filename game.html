@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>حرب العناصر</title>
+  <title>لعبة التخمين</title>
   <style>
     body {
       margin: 0;
@@ -11,220 +11,157 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: #000;
-    }.game-title {
-  text-align: center;
-  font-size: 36px;
-  color: #fff;
-  margin-top: 30px;
-  text-shadow: 2px 2px 5px #000;
-}
-
-.main-box {
-  width: 80%;
-  max-width: 900px;
-  min-height: 400px;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 20px;
-  padding: 30px;
-  margin: 30px auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  transition: all 0.3s ease;
-}
-
-.item {
-  width: 100px;
-  height: 100px;
-  background: #fff;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.3s;
-  position: relative;
-}
-
-.item:hover {
-  transform: scale(1.1);
-}
-
-.item .name {
-  position: absolute;
-  font-size: 22px;
-  color: #222;
-  animation: fadeOut 3s forwards;
-}
-
-.item .winner {
-  font-size: 26px;
-  font-weight: bold;
-  color: #d4af37;
-}
-
-.faded {
-  opacity: 0.2;
-  pointer-events: none;
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  font-size: 28px;
-  max-width: 500px;
-  color: #222;
-  box-shadow: 0 0 30px #000;
-}
-
-.modal-content.loser {
-  border: 4px solid #d4af37;
-  color: #d60000;
-}
-
-.modal-content.winner {
-  border: 4px solid #0f0;
-  color: #0a0;
-}
-
-.modal-content .name-highlight {
-  color: #d4af37;
-  font-weight: bold;
-  font-size: 32px;
-}
-
-.restart-btn {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 18px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
+      transition: background-image 0.8s ease-in-out;
+    }
+    .game-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 20px;
+      color: white;
+      text-shadow: 1px 1px 4px #000;
+    }
+    .main-box {
+      width: 90%;
+      max-width: 800px;
+      min-height: 400px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    .emoji-box {
+      width: 100px;
+      height: 100px;
+      font-size: 50px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .emoji-box:hover {
+      transform: scale(1.1);
+    }
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      color: white;
+      font-size: 36px;
+      text-align: center;
+      flex-direction: column;
+    }
+    .popup span.name {
+      color: gold;
+      font-weight: bold;
+      font-size: 42px;
+      margin-top: 20px;
+    }
+    .restart-button {
+      margin-top: 30px;
+      padding: 15px 25px;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #28a745;
+      border: none;
+      border-radius: 8px;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <div class="game-title" id="gameTitle"></div>
-  <div class="main-box" id="itemsGrid"></div>
-  <div id="modal" class="modal" style="display:none" onclick="hideModal()">
-    <div id="modalContent" class="modal-content"></div>
+  <div class="main-box" id="emojiGrid"></div>  <div class="popup" id="resultPopup" style="display:none">
+    <div id="resultText"></div>
+    <span class="name" id="resultName"></span>
+    <button class="restart-button" onclick="restartGame()">🔁 إعادة اللعبة</button>
   </div>  <script>
     const topic = sessionStorage.getItem("topic") || "default";
     const words = JSON.parse(sessionStorage.getItem("words")) || [];
+
+    const emojiMap = {
+      "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+      "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
+      "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
+      "default": ["❓"]
+    };
+
     const bgMap = {
       "fruits": "fruits.jpg",
       "food": "food.jpg",
       "flags": "flags.jpg",
       "default": "default.jpg"
     };
+
     const titleMap = {
-      "fruits": "حرب الفواكه",
-      "food": "حرب الأكل",
-      "flags": "حرب الأعلام",
-      "default": "حرب العناصر"
-    };
-    const emojiMap = {
-      "fruits": ["🍎","🍌","🍇","🍉","🍒","🍓","🍍","🥭","🍊","🥐","🍈","🥥","🦪","🍅","🦻","🥝","🍏","🍋","🍈","🌶️","🥕","🥦","🧄","🥔","🌽","🥬","🧁"],
-      "food": ["🍔","🍕","🍟","🍫","🍗","🍣","🍳","🥩","🌯","🍝","🍚","🥗","🍜","🍦","🍰"],
-      "flags": ["🇦🇪","🇧🇸","🇸🇾","🇩🇿","🇮🇶","🇯🇴","🇱🇧","🇲🇾","🇵🇸","🇦🇪","🇯🇵","🇰🇬","🇾🇴"],
-      "default": ["❓"]
+      "fruits": "🍎 حرب الفواكه",
+      "food": "🍔 حرب الأكل",
+      "flags": "🏳️ حرب الأعلام",
+      "default": "لعبة التخمين"
     };
 
     document.body.style.backgroundImage = `url('${bgMap[topic] || bgMap.default}')`;
     document.getElementById("gameTitle").textContent = titleMap[topic] || titleMap.default;
 
-    const grid = document.getElementById("itemsGrid");
-    const modal = document.getElementById("modal");
-    const modalContent = document.getElementById("modalContent");
-    const emojis = [...emojiMap[topic]];
-    const remainingNames = [...words];
-    let isModalVisible = false;
+    const emojiGrid = document.getElementById("emojiGrid");
+    const resultPopup = document.getElementById("resultPopup");
+    const resultText = document.getElementById("resultText");
+    const resultName = document.getElementById("resultName");
 
-    // Shuffle and trim emoji list to match number of names
-    const selectedEmojis = emojis.sort(() => 0.5 - Math.random()).slice(0, words.length);
-
-    selectedEmojis.forEach((emoji, index) => {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = emoji;
-      div.dataset.emoji = emoji;
-
-      div.onclick = () => {
-        if (div.clicked || isModalVisible) return;
-        div.clicked = true;
-
-        const randIdx = Math.floor(Math.random() * remainingNames.length);
-        const selected = remainingNames.splice(randIdx, 1)[0];
-        div.innerHTML = `<div class="name">${selected}</div>`;
-        div.classList.add("faded");
-
-        // Show loser modal
-        showModal(`💔 <span class="name-highlight">${selected}</span> حظًا أوفر`, "loser");
-
-        // If one emoji remains
-        const remaining = [...document.querySelectorAll('.item')].filter(d => !d.clicked);
-        if (remaining.length === 1) {
-          setTimeout(() => {
-            const winnerDiv = remaining[0];
-            const winnerEmoji = winnerDiv.dataset.emoji;
-            const winnerName = remainingNames[0];
-            winnerDiv.innerHTML = `<div class="name winner">${winnerName}</div>`;
-            showModal(`🏆 الفائز هو <span class="name-highlight">${winnerName}</span> ${winnerEmoji}`, "winner");
-          }, 2000);
-        }
-      };
-
-      grid.appendChild(div);
-    });
-
-    function showModal(message, type) {
-      isModalVisible = true;
-      modalContent.innerHTML = message;
-      modalContent.className = `modal-content ${type}`;
-      modal.style.display = "flex";
-
-      if (type === "winner") {
-        const restartBtn = document.createElement("button");
-        restartBtn.textContent = "إعادة اللعبة";
-        restartBtn.className = "restart-btn";
-        restartBtn.onclick = () => {
-          window.location = "index.html";
-        };
-        modalContent.appendChild(restartBtn);
-      }
+    let remaining = [...words];
+    let usedEmojis = [...(emojiMap[topic] || emojiMap.default)].sort(() => 0.5 - Math.random());
+    if (usedEmojis.length < remaining.length) {
+      usedEmojis = usedEmojis.concat(Array(remaining.length - usedEmojis.length).fill("❓"));
     }
 
-    function hideModal() {
-      modal.style.display = "none";
-      isModalVisible = false;
+    function createEmojiBox(name, emoji) {
+      const box = document.createElement("div");
+      box.className = "emoji-box";
+      box.textContent = emoji;
+      box.onclick = () => {
+        if (remaining.length <= 1 || resultPopup.style.display === 'flex') return;
+        box.textContent = name;
+        box.style.transition = "opacity 2s ease";
+        box.style.opacity = 0;
+
+        setTimeout(() => {
+          box.remove();
+        }, 2000);
+
+        remaining = remaining.filter(n => n !== name);
+
+        if (remaining.length === 1) {
+          // Show winner popup
+          setTimeout(() => {
+            resultText.textContent = "🏆 الفائز هو";
+            resultName.textContent = remaining[0];
+            resultPopup.style.display = "flex";
+          }, 1500);
+        }
+      };
+      return box;
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      emojiGrid.appendChild(createEmojiBox(words[i], usedEmojis[i] || "❓"));
+    }
+
+    function restartGame() {
+      window.location = "index.html";
     }
   </script></body>
 </html>
