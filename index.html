@@ -5,37 +5,60 @@
   <title>اختر الفئة</title>
   <style>
     body {
-  font-family: sans-serif;
-  text-align: center;
-  padding: 50px;
-  margin: 0;
-  min-height: 100vh;
-  background-image: url('default.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+      min-height: 100vh;
+      background-image: url('default.jpg'); /* ضع صورة الخلفية المناسبة هنا */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
+
+    h1 {
+      background-color: rgba(255, 255, 255, 0.6);
+      padding: 20px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
     textarea {
       width: 80%;
+      max-width: 500px;
       height: 150px;
       margin-bottom: 20px;
       padding: 10px;
       font-size: 16px;
       border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
     }
+
     button {
       margin: 10px;
-      padding: 15px 25px;
+      padding: 15px 30px;
       font-size: 18px;
       cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffffffcc;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #e0e0e0;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
   <h1>اكتب الأسماء واختر فئة اللعبة</h1>
+  <br><br>
   <textarea id="namesInput" placeholder="اكتب كل اسم في سطر"></textarea><br>
+
+  <!-- الفئات -->
   <button onclick="startGame('fruits')">🍎 فواكه</button>
-  <button onclick="startGame('planets')">🪐 كواكب</button>
   <button onclick="startGame('food')">🍔 أكل</button>
   <button onclick="startGame('flags')">🏳️ أعلام</button>
 
@@ -43,7 +66,12 @@
     function startGame(topic) {
       const input = document.getElementById('namesInput').value.trim();
       if (!input) return alert("اكتب على الأقل اسم واحد.");
-      const words = input.split('\n').map(w => w.trim()).filter(w => w);
+      
+      const words = input
+        .split('\n')
+        .map(w => w.trim())
+        .filter(w => w);
+
       if (words.length < 2) return alert("اكتب أكثر من اسم.");
 
       sessionStorage.setItem('topic', topic);
