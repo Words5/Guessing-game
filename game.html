@@ -152,7 +152,37 @@
       grid.innerHTML = "";
       words.forEach((_, i) => {
         const div = document.createElement("div");
+   const emojiMap = {
+     "fruits": ["🍎", "🍌", "🍇", "🍉", "🍒", "🍓", "🍍", "🥭", "🍊", "🫐", "🍈", "🥥", "🫒", "🍅", "🫛", "🥝", "🍏", "🍋", "🍈", "🌶️", "🥕", "🥦", "🧄", "🥔", "🌽", "🥬", "🫑"],
+     "food": ["🍔", "🍕", "🍟", "🍫", "🍗", "🍣", "🍳", "🥩", "🌯", "🍝", "🍚", "🥗", "🍜", "🍦", "🍰"],
+     "flags": ["🇸🇦", "🇪🇬", "🇸🇾", "🇩🇿", "🇮🇶", "🇯🇴", "🇱🇧", "🇲🇦", "🇵🇸", "🇦🇪", "🇯🇵", "🇰🇼", "🇱🇾"],
+     "default": ["❓"]
+   };
+
+
+    const titleMap = {
+      "fruits": { text: "🍎 حرب الفواكه", color: "#e74c3c" },
+      "food": { text: "🍔 حرب الأكل", color: "#f39c12" },
+      "flags": { text: "🏳️ حرب الأعلام", color: "#2980b9" },
+      "default": { text: "لعبة التخمين", color: "#555" }
+    };
+
+    document.body.style.backgroundImage = `url('${bgMap[topic] || bgMap['default']}')`;
+    document.getElementById("title").textContent = titleMap[topic]?.text || "اللعبة";
+    document.getElementById("title").style.backgroundColor = titleMap[topic]?.color || "#444";
+
+    const grid = document.getElementById("itemsGrid");
+
+    function renderGrid() {
+      grid.innerHTML = "";
+      words.forEach((_, i) => {
+        const div = document.createElement("div");
         div.className = "item";
+        div.innerHTML = emojiMap[topic] || "❓";
+        div.onclick = () => handleClick(div, i);
+        grid.appendChild(div);
+      });
+    }  div.className = "item";
         div.innerHTML = emojiMap[topic] || "❓";
         div.onclick = () => handleClick(div, i);
         grid.appendChild(div);
