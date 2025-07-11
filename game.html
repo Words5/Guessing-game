@@ -13,15 +13,20 @@
       background-position: center;
       background-repeat: no-repeat;
       transition: background-image 0.8s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
 
     .container {
       max-width: 800px;
-      margin: 40px auto;
-      background: rgba(255, 255, 255, 0.92);
-      padding: 30px;
-      border-radius: 12px;
+      margin: 50px auto;
+      background: rgba(255,255,255,0.85);
+      padding: 40px;
+      border-radius: 20px;
       text-align: center;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
     }
 
     #itemsGrid {
@@ -33,116 +38,108 @@
     }
 
     .item {
-      font-size: 60px;
-      width: 110px;
-      height: 110px;
+      font-size: 64px;
+      padding: 30px;
       background: #fff;
-      border-radius: 15px;
+      border-radius: 16px;
       cursor: pointer;
-      transition: all 0.4s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      position: relative;
+      transition: transform 0.2s ease, opacity 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .item.clicked {
-      animation: popOut 0.7s forwards;
+    .item:hover {
+      transform: scale(1.1);
     }
 
-    .item .emoji {
-      font-size: 50px;
-      transition: opacity 0.3s;
+    .fade-out {
+      animation: fadeOut 2s forwards;
     }
 
-    .item .name {
-      font-size: 24px;
-      color: #222;
-      margin-top: 5px;
-      opacity: 1;
-      transition: opacity 0.3s;
-    }
-
-    @keyframes popOut {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(0.5); opacity: 0; }
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0; right: 0; bottom: 0; left: 0;
-      background-color: rgba(0, 0, 0, 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.8); }
     }
 
     .result-box {
       background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-      padding: 60px 40px;
-      border-radius: 20px;
+      padding: 80px 60px;
+      border-radius: 25px;
       text-align: center;
-      font-size: 32px;
+      font-size: 36px;
       font-weight: bold;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
       animation: popIn 0.5s ease-out;
-      min-width: 300px;
+      min-width: 400px;
+      max-width: 90%;
       color: #333;
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
+      z-index: 999;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .result-box span {
       display: block;
-      margin-top: 20px;
-      font-size: 42px;
+      margin-top: 30px;
+      font-size: 48px;
+      font-weight: bold;
     }
 
-    .result-box button {
-      margin-top: 30px;
-      padding: 12px 25px;
+    .result-box.win span {
+      color: #2ecc71;
+      animation: winFlash 1.5s ease-in-out infinite;
+    }
+
+    .result-box.lose span {
+      color: #e74c3c;
+      animation: loseDrop 0.8s ease-out;
+      text-shadow: 1px 1px 2px #00000033;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8) translate(-50%, -50%); opacity: 0; }
+      to { transform: scale(1) translate(-50%, -50%); opacity: 1; }
+    }
+
+    @keyframes winFlash {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    @keyframes loseDrop {
+      0% { transform: translateY(-100px) scale(0.8); opacity: 0; }
+      60% { transform: translateY(20px) scale(1.1); opacity: 1; }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    #resetBtn {
+      margin-top: 40px;
+      padding: 12px 30px;
       font-size: 20px;
-      background: #007bff;
-      color: white;
       border: none;
       border-radius: 10px;
+      background-color: #3498db;
+      color: white;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
-    .win span { color: #2ecc71; }
-    .lose span { color: #e74c3c; }
+    #resetBtn:hover {
+      background-color: #2980b9;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>اختر عنصرًا</h2>
+    <h2>اختر الإيموجي الصحيح</h2>
     <div id="itemsGrid"></div>
-  </div>
-
-  <div id="winnerOverlay" class="overlay" style="display:none;">
-    <div class="result-box win">
-      🎉 الفائز هو:
-      <span id="winnerName"></span>
-      <button onclick="restartGame()">🔁 إعادة اللعبة</button>
-    </div>
-  </div>
-
-  <div id="loserOverlay" class="overlay" style="display:none;" onclick="hideLoser()">
-    <div class="result-box lose">
-      ❌
-      <span id="loserName"></span>
-    </div>
+    <button id="resetBtn" onclick="location.reload()">🔁 إعادة اللعبة</button>
   </div>
 
   <script>
     const topic = sessionStorage.getItem("topic") || "default";
-    let words = JSON.parse(sessionStorage.getItem("words")) || [];
+    const words = JSON.parse(sessionStorage.getItem("words")) || [];
 
     const bgMap = {
       "fruits": "fruits.jpg",
@@ -151,71 +148,64 @@
       "flags": "flags.jpg"
     };
 
-    document.body.style.backgroundImage = `url('${bgMap[topic] || 'default.jpg'}')`;
+    document.body.style.backgroundImage = `url('${bgMap[topic] || 'bg_default.jpg'}')`;
 
     const grid = document.getElementById("itemsGrid");
-    const winnerOverlay = document.getElementById("winnerOverlay");
-    const loserOverlay = document.getElementById("loserOverlay");
-    const winnerNameSpan = document.getElementById("winnerName");
-    const loserNameSpan = document.getElementById("loserName");
+    let remaining = [...words];
+    let winner = words[Math.floor(Math.random() * words.length)];
 
-    const labels = {
-      fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🥭', '🍍', '🍒'],
-      planets: ['🌍', '🪐', '🌕', '🌑', '🌖', '🌗', '🌘', '☄️'],
-      food: ['🍔', '🍕', '🍟', '🍣', '🌮', '🍜', '🍩', '🍪'],
-      flags: ['🇸🇦', '🇪🇬', '🇲🇦', '🇵🇸', '🇮🇶', '🇸🇾', '🇱🇧', '🇹🇳']
-    };
+    remaining.forEach((word, index) => {
+      const item = document.createElement("div");
+      item.className = "item";
+      item.textContent = getEmoji(topic);
+      item.onclick = () => handleClick(item, word);
+      grid.appendChild(item);
+    });
 
-    let topicIcons = labels[topic] || ['❓'];
-    let remainingWords = [...words];
+    function getEmoji(topic) {
+      const emojis = {
+        "fruits": "🍎",
+        "planets": "🪐",
+        "food": "🍔",
+        "flags": "🏳️",
+        "default": "❓"
+      };
+      return emojis[topic] || "❓";
+    }
 
-    for (let i = 0; i < words.length; i++) {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `<div class="emoji">${topicIcons[i % topicIcons.length]}</div>`;
-      grid.appendChild(div);
+    function handleClick(element, word) {
+      if (element.classList.contains("used")) return;
 
-      div.onclick = function () {
-        if (remainingWords.length === 0 || div.classList.contains('clicked')) return;
+      element.classList.add("used");
+      element.textContent = word;
 
-        const randIndex = Math.floor(Math.random() * remainingWords.length);
-        const chosen = remainingWords.splice(randIndex, 1)[0];
+      setTimeout(() => {
+        element.classList.add("fade-out");
 
-        const emojiDiv = div.querySelector(".emoji");
-        emojiDiv.style.display = "none";
-
-        const nameSpan = document.createElement("div");
-        nameSpan.className = "name";
-        nameSpan.textContent = chosen;
-        div.appendChild(nameSpan);
-
-        div.style.pointerEvents = "none";
+        if (word === winner) {
+          showResultBox(true, word);
+        } else {
+          showResultBox(false, word);
+        }
 
         setTimeout(() => {
-          div.classList.add("clicked");
-
-          if (remainingWords.length === 0) {
-            setTimeout(() => {
-              winnerNameSpan.textContent = chosen;
-              winnerOverlay.style.display = "flex";
-            }, 800);
-          } else {
-            setTimeout(() => {
-              loserNameSpan.textContent = `${chosen} - حظاً أوفر!`;
-              loserOverlay.style.display = "flex";
-            }, 800);
+          element.remove();
+          if (word === winner) {
+            grid.innerHTML = "";
           }
-        }, 2000);
-      };
+        }, 1800);
+      }, 1600);
     }
 
-    function restartGame() {
-      sessionStorage.clear();
-      window.location = 'index.html';
-    }
-
-    function hideLoser() {
-      loserOverlay.style.display = "none";
+    function showResultBox(isWinner, name) {
+      const resultBox = document.createElement("div");
+      resultBox.className = "result-box " + (isWinner ? "win" : "lose");
+      resultBox.innerHTML = `
+        <div>${isWinner ? "🎉 الفائز هو" : "💔 خرج من اللعبة"}:</div>
+        <span>${name}</span>
+        ${!isWinner ? "<div style='margin-top:20px;font-size:22px;'>حظاً أوفر 🌧️</div>" : ""}
+      `;
+      document.body.appendChild(resultBox);
     }
   </script>
 </body>
