@@ -25,14 +25,14 @@
 
     #emojiContainer {
       width: 90%;
-      min-height: 800px;
+      height: 800px;
       background-color: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
       padding: 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       margin: 20px auto;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
@@ -45,17 +45,46 @@
       border-radius: 16px;
       cursor: pointer;
       transition: transform 0.2s ease;
-      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
     .emoji-item:hover {
       transform: scale(1.2);
     }
 
-    .emoji-label {
-      font-size: 18px;
-      margin-top: 8px;
-      color: #333;
+    /* الأنيميشن */
+    .split {
+      display: inline-block;
+      position: relative;
+    }
+
+    .half {
+      position: absolute;
+      top: 0;
+      font-size: 60px;
+      opacity: 1;
+      transition: transform 1s ease, opacity 1s ease;
+    }
+
+    .left-half {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .right-half {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .animate-left {
+      transform: translate(-80px, -40px) rotate(-25deg);
+      opacity: 0;
+    }
+
+    .animate-right {
+      transform: translate(80px, -40px) rotate(25deg);
+      opacity: 0;
     }
 
     .result-overlay {
@@ -128,17 +157,14 @@
       "default": "لعبة التخمين"
     };
 
-    const emojiNames = {
-      "🍎": "تفاحة","🍌": "موز","🍇": "عنب","🍉": "بطيخ","🍒": "كرز","🍓": "فراولة","🍍": "أناناس","🥭": "مانجو","🍊": "برتقال",
-      "🫐": "توت","🍈": "شمام","🥥": "جوز الهند","🫒": "زيتون","🍅": "طماطم","🫛": "بازلاء","🥝": "كيوي","🍏": "تفاحة خضراء","🍋": "ليمون",
-      "🌶️": "فلفل حار","🥕": "جزر","🥦": "بروكلي","🧄": "ثوم","🥔": "بطاطس","🌽": "ذرة","🥬": "خس","🫑": "فلفل",
-      "🍔": "برجر","🍕": "بيتزا","🍟": "بطاطس مقلية","🍫": "شوكولاتة","🍗": "دجاج","🍣": "سوشي","🍳": "بيض","🥩": "ستيك","🌯": "بوريتو",
-      "🍝": "مكرونة","🍚": "أرز","🥗": "سلطة","🍜": "شوربة نودلز","🍦": "آيس كريم","🍰": "كيك",
-      "🇸🇦": "السعودية","🇪🇬": "مصر","🇸🇾": "سوريا","🇩🇿": "الجزائر","🇮🇶": "العراق","🇯🇴": "الأردن","🇱🇧": "لبنان","🇲🇦": "المغرب",
-      "🇵🇸": "فلسطين","🇦🇪": "الإمارات","🇯🇵": "اليابان","🇰🇼": "الكويت","🇱🇾": "ليبيا"
+    const backgrounds = {
+      "fruits": "https://i.imgur.com/ojd4J9W.jpg",
+      "food": "https://i.imgur.com/udw2P3O.jpg",
+      "flags": "https://i.imgur.com/I4k6Avr.jpg",
+      "default": "https://i.imgur.com/va7uZQc.jpg"
     };
 
-    document.body.style.backgroundImage = `url('${topic}.jpg')`;
+    document.body.style.backgroundImage = `url('${backgrounds[topic] || backgrounds.default}')`;
     document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
 
     const container = document.getElementById("emojiContainer");
@@ -156,11 +182,7 @@
           <div><span class="name">${name}</span> خرج من اللعبة</div>
         </div>
       `;
-      overlay.onclick = () => {
-        overlay.remove();
-        const shown = document.querySelector(`[data-name='${name}']`);
-        if (shown) shown.remove();
-      };
+      overlay.onclick = () => overlay.remove();
       document.body.appendChild(overlay);
     }
 
@@ -189,34 +211,40 @@
       return "❓";
     }
 
+    function breakEmoji(div, name) {
+      const emoji = div.textContent;
+      div.innerHTML = `
+        <span class="half left-half">${emoji}</span>
+        <span class="half right-half">${emoji}</span>
+      `;
+      const left = div.querySelector(".left-half");
+      const right = div.querySelector(".right-half");
+
+      setTimeout(() => {
+        left.classList.add("animate-left");
+        right.classList.add("animate-right");
+      }, 50);
+
+      setTimeout(() => {
+        const index = currentWords.indexOf(name);
+        if (index !== -1) currentWords.splice(index, 1);
+        div.remove();
+        if (currentWords.length === 1) {
+          showWinner(currentWords[0]);
+        } else {
+          showLoser(name);
+        }
+      }, 1200);
+    }
+
     function renderEmojis() {
       container.innerHTML = "";
       currentWords.forEach(name => {
         const div = document.createElement("div");
         div.className = "emoji-item";
         const emoji = getUniqueEmoji();
-        div.innerHTML = `
-          <div>${emoji}</div>
-          <div class="emoji-label">${emojiNames[emoji] || ""}</div>
-        `;
-        div.onclick = () => {
-          div.textContent = name;
-          div.setAttribute('data-name', name);
-          div.style.transition = "opacity 1.5s ease";
-          setTimeout(() => {
-            div.style.opacity = 0;
-            setTimeout(() => {
-              const index = currentWords.indexOf(name);
-              if (index !== -1) currentWords.splice(index, 1);
-              div.remove();
-              if (currentWords.length === 1) {
-                showWinner(currentWords[0]);
-              } else {
-                showLoser(name);
-              }
-            }, 1500);
-          }, 1500);
-        };
+        div.textContent = emoji;
+        div.onclick = () => breakEmoji(div, name);
         container.appendChild(div);
       });
     }
