@@ -147,6 +147,17 @@
 
     let currentWords = [...words];
 
+    // خلط الأسماء عشوائياً كل مرة
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    currentWords = shuffle(currentWords);
+
     function showLoser(name) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
