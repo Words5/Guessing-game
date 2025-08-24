@@ -15,6 +15,7 @@
       position: relative;
       overflow: hidden;
     }
+
     #gameTitle {
       text-align: center;
       font-size: 40px;
@@ -22,6 +23,7 @@
       color: #222;
       font-weight: bold;
     }
+
     #emojiContainer {
       width: 90%;
       min-height: 800px;
@@ -35,6 +37,7 @@
       margin: 20px auto;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
+
     .emoji-item {
       font-size: 60px;
       padding: 20px;
@@ -45,40 +48,44 @@
       transition: transform 0.2s ease;
       text-align: center;
     }
-    .emoji-item:hover {
-      transform: scale(1.2);
-    }
+    .emoji-item:hover { transform: scale(1.2); }
+
     .emoji-label {
       font-size: 18px;
       margin-top: 8px;
       color: #333;
     }
+
     .result-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      display: flex; justify-content: center; align-items: center;
       z-index: 999;
     }
+
     .result-box {
-      background: #fff8dc;
-      padding: 60px 40px;
-      border-radius: 30px;
+      padding: 80px 40px;
+      border-radius: 40px;
       text-align: center;
       font-size: 32px;
-      width: 70%;
-      max-width: 700px;
+      width: 70%; max-width: 700px;
       box-shadow: 0 0 40px rgba(0,0,0,0.5);
       position: relative;
-      animation: pop 0.5s ease;
+      animation: pop 0.4s ease;
+      /* التدرّج الذهبي */
+      background: linear-gradient(135deg, #fff8dc, #ffd700);
+      border: 4px solid #d4af37;
     }
+
     .result-box h1 {
       font-size: 50px;
       margin-bottom: 20px;
+      color: #b8860b;
+      text-shadow: 0 0 6px #fff;
     }
+
     .name-frame {
       display: inline-block;
       border: 3px solid #d4af37;
@@ -90,10 +97,9 @@
       color: #222;
       margin: 20px 0;
     }
-    .big-emoji {
-      font-size: 120px;
-      margin: 20px 0;
-    }
+
+    .big-emoji { font-size: 120px; margin: 20px 0; }
+
     .restart-btn {
       margin-top: 30px;
       padding: 15px 30px;
@@ -104,79 +110,96 @@
       border-radius: 10px;
       cursor: pointer;
     }
-    /* ألوان خاصة للفوز */
-    .winner-box {
-      background: linear-gradient(135deg, #fff8dc, #ffd700);
-      border: 4px solid #d4af37;
-    }
-    .winner-box h1 {
-      color: #d4af37;
-      text-shadow: 0 0 10px #fff;
-    }
-    /* ألوان خاصة للخسارة */
-    .loser-box {
-      background: #ffecec;
-      border: 3px solid #d9534f;
-    }
-    .loser-box h1 {
-      color: #d9534f;
-    }
+
+    /* نفس التدرّج للفوز والخسارة (بناءً على طلبك) */
+    .winner-box {}
+    .loser-box {}
+
     @keyframes pop {
-      from { transform: scale(0.7); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
     }
   </style>
 </head>
 <body>
   <div id="gameTitle"></div>
   <div id="emojiContainer"></div>
+
   <script>
     const topic = sessionStorage.getItem("topic") || "default";
     const words = JSON.parse(sessionStorage.getItem("words")) || [];
+
     const emojiMap = {
-      "fruits": ["🍎","🍌","🍇","🍉","🍒","🍓","🍍","🥭","🍊"],
-      "food": ["🍔","🍕","🍟","🍫","🍗","🍣","🍳","🥩"],
-      "flags": ["🇸🇦","🇪🇬","🇸🇾","🇩🇿","🇮🇶","🇯🇴","🇱🇧"],
-      "default": ["❓"]
+      "fruits": ["🍎","🍌","🍇","🍉","🍒","🍓","🍍","🥭","🍊","🫐","🍈","🥥","🫒","🍅","🫛","🥝","🍏","🍋","🌶️","🥕","🥦","🧄","🥔","🌽","🥬","🫑"],
+      "food":   ["🍔","🍕","🍟","🍫","🍗","🍣","🍳","🥩","🌯","🍝","🍚","🥗","🍜","🍦","🍰"],
+      "flags":  ["🇸🇦","🇪🇬","🇸🇾","🇩🇿","🇮🇶","🇯🇴","🇱🇧","🇲🇦","🇵🇸","🇦🇪","🇯🇵","🇰🇼","🇱🇾"],
+      "default":["❓"]
     };
+
     const titles = {
       "fruits": "حرب الفواكه",
-      "food": "حرب الأكل",
-      "flags": "حرب الأعلام",
-      "default": "لعبة التخمين"
+      "food":   "حرب الأكل",
+      "flags":  "حرب الأعلام",
+      "default":"لعبة التخمين"
     };
+
+    const emojiNames = {
+      "🍎": "تفاحة","🍌": "موز","🍇": "عنب","🍉": "بطيخ","🍒": "كرز","🍓": "فراولة","🍍": "أناناس","🥭": "مانجو","🍊": "برتقال",
+      "🫐": "توت","🍈": "شمام","🥥": "جوز الهند","🫒": "زيتون","🍅": "طماطم","🫛": "بازلاء","🥝": "كيوي","🍏": "تفاحة خضراء","🍋": "ليمون",
+      "🌶️": "فلفل حار","🥕": "جزر","🥦": "بروكلي","🧄": "ثوم","🥔": "بطاطس","🌽": "ذرة","🥬": "خس","🫑": "فلفل",
+      "🍔": "برجر","🍕": "بيتزا","🍟": "بطاطس مقلية","🍫": "شوكولاتة","🍗": "دجاج","🍣": "سوشي","🍳": "بيض","🥩": "ستيك","🌯": "بوريتو",
+      "🍝": "مكرونة","🍚": "أرز","🥗": "سلطة","🍜": "شوربة نودلز","🍦": "آيس كريم","🍰": "كيك",
+      "🇸🇦":"السعودية","🇪🇬":"مصر","🇸🇾":"سوريا","🇩🇿":"الجزائر","🇮🇶":"العراق","🇯🇴":"الأردن","🇱🇧":"لبنان","🇲🇦":"المغرب",
+      "🇵🇸":"فلسطين","🇦🇪":"الإمارات","🇯🇵":"اليابان","🇰🇼":"الكويت","🇱🇾":"ليبيا"
+    };
+
+    // تحميل الخلفيات مسبقاً
+    ["fruits.jpg","food.jpg","flags.jpg","default.jpg"].forEach(src => { const i=new Image(); i.src=src; });
 
     document.body.style.backgroundImage = `url('${topic}.jpg')`;
     document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
-    const container = document.getElementById("emojiContainer");
-    let currentWords = [...words];
 
-    // خلط الأسماء
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    const container = document.getElementById("emojiContainer");
+
+    // أسماء اللاعبين (من الذاكرة) + خلط
+    let currentWords = [...words];
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
       }
-      return array;
+      return arr;
     }
     currentWords = shuffle(currentWords);
 
-    // دوال النتيجة
-    function showLoser(name, emoji) {
+    // منع تكرار الإيموجي
+    const usedEmojis = new Set();
+    const availableEmojis = [...(emojiMap[topic] || emojiMap.default)];
+    function getUniqueEmoji(){
+      if(availableEmojis.length === 0) return "❓"; // في حال عدد اللاعبين أكبر من عدد الإيموجي
+      const idx = Math.floor(Math.random()*availableEmojis.length);
+      const emoji = availableEmojis.splice(idx,1)[0];
+      usedEmojis.add(emoji);
+      return emoji;
+    }
+
+    // نوافذ النتائج (بنفس التدرّج)
+    function showLoser(name, emoji){
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
         <div class="result-box loser-box">
-          <h1>خسر اللعبة</h1>
+          <h1>حظ أوفر!</h1>
           <div class="name-frame">${name}</div>
           <div class="big-emoji">${emoji}</div>
+          <div>خرج من اللعبة</div>
         </div>
       `;
       overlay.onclick = () => overlay.remove();
       document.body.appendChild(overlay);
     }
 
-    function showWinner(name, emoji) {
+    function showWinner(name, emoji){
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
@@ -190,36 +213,37 @@
       document.body.appendChild(overlay);
     }
 
-    function getEmoji() {
-      const list = emojiMap[topic] || emojiMap["default"];
-      return list[Math.floor(Math.random() * list.length)];
-    }
-
-    function renderEmojis() {
+    function renderEmojis(){
       container.innerHTML = "";
-      currentWords.forEach(name => {
+      currentWords.forEach(name=>{
         const div = document.createElement("div");
         div.className = "emoji-item";
-        const emoji = getEmoji();
+        const emoji = getUniqueEmoji();
         div.innerHTML = `
           <div>${emoji}</div>
+          <div class="emoji-label">${emojiNames[emoji] || ""}</div>
         `;
         div.onclick = () => {
+          // استبدال الإيموجي بالاسم ثم إزالة العنصر فورًا
           div.textContent = name;
-          const index = currentWords.indexOf(name);
-          if (index !== -1) currentWords.splice(index, 1);
+          div.setAttribute("data-name", name);
+
+          const idx = currentWords.indexOf(name);
+          if(idx !== -1) currentWords.splice(idx,1);
           div.remove();
 
-          if (currentWords.length > 0) {
+          if(currentWords.length > 0){
+            // ليس الأخير → خاسر
             showLoser(name, emoji);
-          }
-          if (currentWords.length === 0) {
+          } else {
+            // الأخير → فائز
             showWinner(name, emoji);
           }
         };
         container.appendChild(div);
       });
     }
+
     renderEmojis();
   </script>
 </body>
