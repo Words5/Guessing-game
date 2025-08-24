@@ -71,78 +71,38 @@
       z-index: 999;
     }
 
-    .result-card {
-      width: 300px;
-      height: 420px;
-      border-radius: 20px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      animation: popIn 0.6s ease-out;
-    }
-
-    .result-card.winner {
-      background: linear-gradient(135deg, #fff8dc, #ffd700);
-      border: 3px solid gold;
-    }
-
-    .result-card.loser {
-      background: linear-gradient(135deg, #ffe5e5, #cc0000);
-      border: 3px solid crimson;
-    }
-
-    .result-card .emoji {
-      font-size: 100px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .glass-shine {
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(120deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.2) 100%);
-      transform: rotate(25deg);
-      animation: shineMove 3s infinite linear;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .player-name {
-      margin-top: 20px;
-      font-size: 32px;
-      font-weight: bold;
+    .result-box {
+      background: #fff8dc;
       color: #222;
-      text-shadow: 0 0 8px rgba(0,0,0,0.4);
-      z-index: 3;
+      padding: 60px 40px;
+      border-radius: 30px;
+      text-align: center;
+      font-size: 42px;
+      width: 60%;
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .result-box h1 {
+      font-size: 50px;
+      margin-bottom: 20px;
+      color: #d4af37;
+    }
+
+    .result-box span.name {
+      color: crimson;
+      font-weight: bold;
     }
 
     .restart-btn {
-      margin-top: 25px;
-      padding: 12px 25px;
-      font-size: 18px;
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 20px;
       background-color: #444;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      z-index: 3;
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes shineMove {
-      from { transform: rotate(25deg) translateX(-100%); }
-      to { transform: rotate(25deg) translateX(100%); }
     }
   </style>
 </head>
@@ -178,6 +138,13 @@
       "🇵🇸": "فلسطين","🇦🇪": "الإمارات","🇯🇵": "اليابان","🇰🇼": "الكويت","🇱🇾": "ليبيا"
     };
 
+    // تحميل مسبق للخلفيات
+    const bgImages = ["fruits.jpg", "food.jpg", "flags.jpg", "default.jpg"];
+    bgImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
     document.body.style.backgroundImage = `url('${topic}.jpg')`;
     document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
 
@@ -187,26 +154,34 @@
 
     let currentWords = [...words];
 
-    function showCard(name, emoji, type) {
+    function showLoser(name) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
-        <div class="result-card ${type}">
-          <div class="glass-shine"></div>
-          <div class="emoji">${emoji}</div>
-          <div class="player-name">${name}</div>
-          ${type === "winner" ? `<button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>` : ""}
+        <div class="result-box">
+          <h1>حظ أوفر!</h1>
+          <div><span class="name">${name}</span> خرج من اللعبة</div>
         </div>
       `;
+      overlay.onclick = () => {
+        overlay.remove();
+        const shown = document.querySelector(`[data-name='${name}']`);
+        if (shown) shown.remove();
+      };
       document.body.appendChild(overlay);
     }
 
-    function showLoser(name, emoji) {
-      showCard(name, emoji, "loser");
-    }
-
     function showWinner(name, emoji) {
-      showCard(name, emoji, "winner");
+      const overlay = document.createElement("div");
+      overlay.className = "result-overlay";
+      overlay.innerHTML = `
+        <div class="result-box">
+          <h1>الفائز هو</h1>
+          <div><span class="name">${name}</span> ${emoji}</div>
+          <button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
     }
 
     function getUniqueEmoji() {
@@ -221,17 +196,11 @@
       return "❓";
     }
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
     function renderEmojis() {
       container.innerHTML = "";
-      currentWords = shuffle(currentWords);
+      // خلط اللاعبين عشوائيًا
+      currentWords = currentWords.sort(() => Math.random() - 0.5);
+
       currentWords.forEach(name => {
         const div = document.createElement("div");
         div.className = "emoji-item";
@@ -251,9 +220,10 @@
               if (index !== -1) currentWords.splice(index, 1);
               div.remove();
               if (currentWords.length === 1) {
+                // مرر الإيموجي للفائز
                 showWinner(currentWords[0], emoji);
               } else {
-                showLoser(name, emoji);
+                showLoser(name);
               }
             }, 1500);
           }, 1500);
