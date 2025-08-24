@@ -183,10 +183,11 @@
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
-        <div class="result-box loser-box">
-          <h1>خرج من اللعبة</h1>
-          <div class="player-name">${name}</div>
-          <div class="player-emoji">${emoji}</div>
+        loser-box">
+          <h1>حظ أوفر!</h1>
+          <div class="name-frame">${name}</div>
+          <div class="big-emoji">${emoji}</div>
+          <div>خرج من اللعبة</div>
         </div>
       `;
       overlay.onclick = () => overlay.remove();
