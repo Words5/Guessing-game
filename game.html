@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>لعبة التخمين</title>
   <style>
-    /* الصفحة والخلفية */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -13,21 +12,17 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      position: relative;
-      overflow: hidden;
+      transition: background-image 0.8s ease-in-out;
     }
 
-    /* عنوان اللعبة */
     #gameTitle {
       text-align: center;
       font-size: 40px;
       margin-top: 20px;
       color: #222;
       font-weight: bold;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
-    /* الحاوية */
     #emojiContainer {
       width: 90%;
       min-height: 800px;
@@ -38,124 +33,116 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-start;
-      gap: 16px;
-      margin: 20px auto 40px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.12);
+      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
 
-    /* بطاقة الإيموجي */
     .emoji-item {
       font-size: 60px;
-      padding: 18px 22px;
-      background-color: #fff;
+      padding: 20px;
+      margin: 10px;
+      background-color: white;
       border-radius: 16px;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      transition: transform 0.2s ease;
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      user-select: none;
     }
-    .emoji-item:hover { transform: translateY(-4px) scale(1.06); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
+
+    .emoji-item:hover {
+      transform: scale(1.2);
+    }
 
     .emoji-label {
-      font-size: 16px;
-      margin-top: 6px;
-      color: #444;
+      font-size: 18px;
+      margin-top: 8px;
+      color: #333;
     }
 
-    /* طبقة الإظهار للنتيجة */
     .result-overlay {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0, 0, 0, 0.7);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 999;
-      padding: 20px;
     }
 
-    /* بطاقة شخصية (Character Card) للفوز/الخسارة */
-    .result-box {
-      width: 320px;
-      height: 480px;
-      background: linear-gradient(135deg, #fff, #f4f4f6);
-      border: 6px solid #444;
+    .result-card {
+      width: 300px;
+      height: 420px;
       border-radius: 20px;
-      box-shadow: 0 14px 35px rgba(0,0,0,0.55);
-      text-align: center;
-      padding: 20px;
       position: relative;
       overflow: hidden;
-      animation: cardEnter 0.7s ease-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      animation: popIn 0.6s ease-out;
     }
-    .result-box::before {
-      content: "";
+
+    .result-card.winner {
+      background: linear-gradient(135deg, #fff8dc, #ffd700);
+      border: 3px solid gold;
+    }
+
+    .result-card.loser {
+      background: linear-gradient(135deg, #ffe5e5, #cc0000);
+      border: 3px solid crimson;
+    }
+
+    .result-card .emoji {
+      font-size: 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass-shine {
       position: absolute;
-      inset: -30%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), transparent 60%),
-                  radial-gradient(circle at 70% 70%, rgba(255,255,255,0.25), transparent 60%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.2) 100%);
+      transform: rotate(25deg);
+      animation: shineMove 3s infinite linear;
+      z-index: 2;
       pointer-events: none;
     }
 
-    .result-box h1 {
+    .player-name {
+      margin-top: 20px;
       font-size: 32px;
-      margin-bottom: 10px;
-      color: #111;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      font-weight: bold;
+      color: #222;
+      text-shadow: 0 0 8px rgba(0,0,0,0.4);
+      z-index: 3;
     }
 
-    /* أيقونة مركزية كبيرة (نجمة/جمجمة) */
-    .result-box .icon {
-      font-size: 110px;
-      margin: 28px 0 18px;
-      display: block;
-      line-height: 1;
-    }
-
-    /* لوحة اسم اللاعب */
-    .result-box .name {
-      display: inline-block;
-      font-weight: 800;
-      font-size: 24px;
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.78);
-      margin-top: 6px;
-      letter-spacing: 0.5px;
-    }
-
-    /* تمييز الفوز */
-    .result-box.winner {
-      border-color: #caa300;
-      background: linear-gradient(135deg, #fff8d6, #ffd700);
-    }
-    .result-box.winner .icon { color: #ffd700; text-shadow: 0 0 22px #ffd700; }
-
-    /* تمييز الخسارة */
-    .result-box.loser {
-      border-color: #b5122a;
-      background: linear-gradient(135deg, #ffe1e4, #ff4d4d);
-    }
-    .result-box.loser .icon { color: #e01431; text-shadow: 0 0 22px #e01431; }
-
-    /* زر إعادة */
     .restart-btn {
-      margin-top: 16px;
-      padding: 10px 20px;
+      margin-top: 25px;
+      padding: 12px 25px;
       font-size: 18px;
-      background: #222;
+      background-color: #444;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      z-index: 3;
     }
 
-    /* دخول البطاقة بخفة (بدون لاگ) */
-    @keyframes cardEnter {
-      from { transform: scale(0.6) rotate(-8deg); opacity: 0; }
-      to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes shineMove {
+      from { transform: rotate(25deg) translateX(-100%); }
+      to { transform: rotate(25deg) translateX(100%); }
     }
   </style>
 </head>
@@ -164,31 +151,21 @@
   <div id="emojiContainer"></div>
 
   <script>
-    /* الموضوع/الخلفية + أسماء اللاعبين من sessionStorage */
     const topic = sessionStorage.getItem("topic") || "default";
     const words = JSON.parse(sessionStorage.getItem("words")) || [];
 
-    /* تحميل مسبق للخلفيات لتقليل التأخير */
-    const bgImages = ["fruits.jpg", "food.jpg", "flags.jpg", "default.jpg"];
-    bgImages.forEach(src => { const img = new Image(); img.src = src; });
-
-    /* تعيين الخلفية فوراً */
-    document.body.style.backgroundImage = `url('${topic}.jpg')`;
-
-    /* العناوين/الإيموجيات */
-    const titles = {
-      fruits: "حرب الفواكه",
-      food: "حرب الأكل",
-      flags: "حرب الأعلام",
-      default: "لعبة التخمين"
-    };
-    document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
-
     const emojiMap = {
-      fruits: ["🍎","🍌","🍇","🍉","🍒","🍓","🍍","🥭","🍊","🫐","🍈","🥥","🫒","🍅","🫛","🥝","🍏","🍋","🌶️","🥕","🥦","🧄","🥔","🌽","🥬","🫑"],
-      food: ["🍔","🍕","🍟","🍫","🍗","🍣","🍳","🥩","🌯","🍝","🍚","🥗","🍜","🍦","🍰"],
-      flags: ["🇸🇦","🇪🇬","🇸🇾","🇩🇿","🇮🇶","🇯🇴","🇱🇧","🇲🇦","🇵🇸","🇦🇪","🇯🇵","🇰🇼","🇱🇾"],
-      default: ["❓"]
+      "fruits": ["🍎","🍌","🍇","🍉","🍒","🍓","🍍","🥭","🍊","🫐","🍈","🥥","🫒","🍅","🫛","🥝","🍏","🍋","🌶️","🥕","🥦","🧄","🥔","🌽","🥬","🫑"],
+      "food": ["🍔","🍕","🍟","🍫","🍗","🍣","🍳","🥩","🌯","🍝","🍚","🥗","🍜","🍦","🍰"],
+      "flags": ["🇸🇦","🇪🇬","🇸🇾","🇩🇿","🇮🇶","🇯🇴","🇱🇧","🇲🇦","🇵🇸","🇦🇪","🇯🇵","🇰🇼","🇱🇾"],
+      "default": ["❓"]
+    };
+
+    const titles = {
+      "fruits": "حرب الفواكه",
+      "food": "حرب الأكل",
+      "flags": "حرب الأعلام",
+      "default": "لعبة التخمين"
     };
 
     const emojiNames = {
@@ -201,50 +178,37 @@
       "🇵🇸": "فلسطين","🇦🇪": "الإمارات","🇯🇵": "اليابان","🇰🇼": "الكويت","🇱🇾": "ليبيا"
     };
 
+    document.body.style.backgroundImage = `url('${topic}.jpg')`;
+    document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
+
     const container = document.getElementById("emojiContainer");
     const usedEmojis = new Set();
-    const availableEmojis = [...(emojiMap[topic] || emojiMap.default)];
+    const availableEmojis = [...emojiMap[topic]];
 
-    /* خلط الأسماء: Fisher–Yates لتوزيع عادل */
     let currentWords = [...words];
-    (function shuffle(arr){
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    })(currentWords);
 
-    /* إظهار بطاقة خسارة (كرت شخصية) */
-    function showLoser(name) {
+    function showCard(name, emoji, type) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
-        <div class="result-box loser" role="dialog" aria-label="خسارة">
-          <h1>خسرت!</h1>
-          <div class="icon">💀</div>
-          <span class="name">${name}</span>
-        </div>
-      `;
-      document.body.appendChild(overlay);
-      overlay.onclick = () => overlay.remove();
-    }
-
-    /* إظهار بطاقة فوز (كرت شخصية) */
-    function showWinner(name) {
-      const overlay = document.createElement("div");
-      overlay.className = "result-overlay";
-      overlay.innerHTML = `
-        <div class="result-box winner" role="dialog" aria-label="فوز">
-          <h1>🎉 الفائز 🎉</h1>
-          <div class="icon">⭐</div>
-          <span class="name">${name}</span>
-          <button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>
+        <div class="result-card ${type}">
+          <div class="glass-shine"></div>
+          <div class="emoji">${emoji}</div>
+          <div class="player-name">${name}</div>
+          ${type === "winner" ? `<button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>` : ""}
         </div>
       `;
       document.body.appendChild(overlay);
     }
 
-    /* اختيار إيموجي فريد لكل عنصر */
+    function showLoser(name, emoji) {
+      showCard(name, emoji, "loser");
+    }
+
+    function showWinner(name, emoji) {
+      showCard(name, emoji, "winner");
+    }
+
     function getUniqueEmoji() {
       while (availableEmojis.length) {
         const index = Math.floor(Math.random() * availableEmojis.length);
@@ -257,33 +221,43 @@
       return "❓";
     }
 
-    /* الرسم والتفاعل */
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
     function renderEmojis() {
       container.innerHTML = "";
+      currentWords = shuffle(currentWords);
       currentWords.forEach(name => {
         const div = document.createElement("div");
         div.className = "emoji-item";
         const emoji = getUniqueEmoji();
-        div.innerHTML = `<div>${emoji}</div><div class="emoji-label">${emojiNames[emoji] || ""}</div>`;
-
+        div.innerHTML = `
+          <div>${emoji}</div>
+          <div class="emoji-label">${emojiNames[emoji] || ""}</div>
+        `;
         div.onclick = () => {
-          /* عرض الاسم ثم تلاشي سريع بلا تأخير زائد */
           div.textContent = name;
           div.setAttribute('data-name', name);
-          div.style.transition = "opacity 0.9s ease";
-          div.style.opacity = 0;
+          div.style.transition = "opacity 1.5s ease";
           setTimeout(() => {
-            const idx = currentWords.indexOf(name);
-            if (idx !== -1) currentWords.splice(idx, 1);
-            div.remove();
-            if (currentWords.length === 1) {
-              showWinner(currentWords[0]);
-            } else {
-              showLoser(name);
-            }
-          }, 900);
+            div.style.opacity = 0;
+            setTimeout(() => {
+              const index = currentWords.indexOf(name);
+              if (index !== -1) currentWords.splice(index, 1);
+              div.remove();
+              if (currentWords.length === 1) {
+                showWinner(currentWords[0], emoji);
+              } else {
+                showLoser(name, emoji);
+              }
+            }, 1500);
+          }, 1500);
         };
-
         container.appendChild(div);
       });
     }
