@@ -15,6 +15,7 @@
       position: relative;
       overflow: hidden;
     }
+    /* طبقة التلاشي */
     body::after {
       content: "";
       position: absolute;
@@ -81,22 +82,30 @@
     .result-box {
       background: #fff8dc;
       color: #222;
-      padding: 60px 40px;
-      border-radius: 30px;
+      padding: 80px 40px;
+      border-radius: 40px;
       text-align: center;
       font-size: 42px;
-      width: 60%;
+      width: 70%;
+      max-width: 700px;
       box-shadow: 0 0 40px rgba(0,0,0,0.5);
       position: relative;
     }
     .result-box h1 {
-      font-size: 50px;
-      margin-bottom: 20px;
+      font-size: 60px;
+      margin-bottom: 30px;
       color: #d4af37;
     }
     .result-box span.name {
+      display: block;
+      font-size: 40px;
       color: crimson;
       font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .big-emoji {
+      font-size: 120px;
+      margin: 20px 0;
     }
     .restart-btn {
       margin-top: 30px;
@@ -137,23 +146,22 @@
       "🇸🇦": "السعودية","🇪🇬": "مصر","🇸🇾": "سوريا","🇩🇿": "الجزائر","🇮🇶": "العراق","🇯🇴": "الأردن","🇱🇧": "لبنان","🇲🇦": "المغرب",
       "🇵🇸": "فلسطين","🇦🇪": "الإمارات","🇯🇵": "اليابان","🇰🇼": "الكويت","🇱🇾": "ليبيا"
     };
-
+    // تحميل الخلفيات مسبقاً
     const bgImages = ["fruits.jpg", "food.jpg", "flags.jpg", "default.jpg"];
     bgImages.forEach(src => {
       const img = new Image();
       img.src = src;
     });
-
+    // تغيير الخلفية
     document.body.classList.remove("change-bg");
     document.body.style.backgroundImage = `url('${topic}.jpg')`;
     setTimeout(() => document.body.classList.add("change-bg"), 50);
-
     document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
     const container = document.getElementById("emojiContainer");
     const usedEmojis = new Set();
     const availableEmojis = [...emojiMap[topic]];
     let currentWords = [...words];
-
+    // خلط الأسماء
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -162,37 +170,33 @@
       return array;
     }
     currentWords = shuffle(currentWords);
-
-    function showLoser(name) {
+    function showLoser(name, emoji) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
         <div class="result-box">
           <h1>حظ أوفر!</h1>
-          <div><span class="name">${name}</span> خرج من اللعبة</div>
+          <span class="name">${name}</span>
+          <div class="big-emoji">${emoji}</div>
+          <div>خرج من اللعبة</div>
         </div>
       `;
-      overlay.onclick = () => {
-        overlay.remove();
-        const shown = document.querySelector(`[data-name='${name}']`);
-        if (shown) shown.remove();
-      };
+      overlay.onclick = () => overlay.remove();
       document.body.appendChild(overlay);
     }
-
-    function showWinner(name) {
+    function showWinner(name, emoji) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
         <div class="result-box">
           <h1>الفائز هو</h1>
-          <div><span class="name">${name}</span></div>
+          <span class="name">${name}</span>
+          <div class="big-emoji">${emoji}</div>
           <button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>
         </div>
       `;
       document.body.appendChild(overlay);
     }
-
     function getUniqueEmoji() {
       while (availableEmojis.length) {
         const index = Math.floor(Math.random() * availableEmojis.length);
@@ -204,7 +208,6 @@
       }
       return "❓";
     }
-
     function renderEmojis() {
       container.innerHTML = "";
       currentWords.forEach(name => {
@@ -218,15 +221,13 @@
         div.onclick = () => {
           div.textContent = name;
           div.setAttribute('data-name', name);
-
           const index = currentWords.indexOf(name);
           if (index !== -1) currentWords.splice(index, 1);
           div.remove();
-
           if (currentWords.length === 1) {
-            showWinner(currentWords[0]);
+            showWinner(currentWords[0], emoji);
           } else {
-            showLoser(name);
+            showLoser(name, emoji);
           }
         };
         container.appendChild(div);
