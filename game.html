@@ -12,7 +12,24 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      transition: background-image 0.8s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* طبقة التلاشي */
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: inherit;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+      z-index: -1;
+    }
+
+    body.change-bg::after {
+      opacity: 1;
     }
 
     #gameTitle {
@@ -138,14 +155,18 @@
       "🇵🇸": "فلسطين","🇦🇪": "الإمارات","🇯🇵": "اليابان","🇰🇼": "الكويت","🇱🇾": "ليبيا"
     };
 
-    // تحميل مسبق للخلفيات
+    // 🔥 تحميل مسبق لكل الخلفيات (مرة وحدة عند بداية الصفحة)
     const bgImages = ["fruits.jpg", "food.jpg", "flags.jpg", "default.jpg"];
     bgImages.forEach(src => {
       const img = new Image();
       img.src = src;
     });
 
+    // تغيير الخلفية بشكل سريع مع تلاشي
+    document.body.classList.remove("change-bg");
     document.body.style.backgroundImage = `url('${topic}.jpg')`;
+    setTimeout(() => document.body.classList.add("change-bg"), 50);
+
     document.getElementById("gameTitle").textContent = titles[topic] || titles.default;
 
     const container = document.getElementById("emojiContainer");
@@ -153,6 +174,17 @@
     const availableEmojis = [...emojiMap[topic]];
 
     let currentWords = [...words];
+
+    // خلط الأسماء عشوائياً كل مرة
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    currentWords = shuffle(currentWords);
 
     function showLoser(name) {
       const overlay = document.createElement("div");
@@ -171,13 +203,13 @@
       document.body.appendChild(overlay);
     }
 
-    function showWinner(name, emoji) {
+    function showWinner(name) {
       const overlay = document.createElement("div");
       overlay.className = "result-overlay";
       overlay.innerHTML = `
         <div class="result-box">
           <h1>الفائز هو</h1>
-          <div><span class="name">${name}</span> ${emoji}</div>
+          <div><span class="name">${name}</span></div>
           <button class="restart-btn" onclick="location.href='index.html'">🔁 إعادة اللعبة</button>
         </div>
       `;
@@ -198,9 +230,6 @@
 
     function renderEmojis() {
       container.innerHTML = "";
-      // خلط اللاعبين عشوائيًا
-      currentWords = currentWords.sort(() => Math.random() - 0.5);
-
       currentWords.forEach(name => {
         const div = document.createElement("div");
         div.className = "emoji-item";
@@ -212,21 +241,18 @@
         div.onclick = () => {
           div.textContent = name;
           div.setAttribute('data-name', name);
-          div.style.transition = "opacity 1.5s ease";
+          div.style.transition = "opacity 1s ease";
+          div.style.opacity = 0;
           setTimeout(() => {
-            div.style.opacity = 0;
-            setTimeout(() => {
-              const index = currentWords.indexOf(name);
-              if (index !== -1) currentWords.splice(index, 1);
-              div.remove();
-              if (currentWords.length === 1) {
-                // مرر الإيموجي للفائز
-                showWinner(currentWords[0], emoji);
-              } else {
-                showLoser(name);
-              }
-            }, 1500);
-          }, 1500);
+            const index = currentWords.indexOf(name);
+            if (index !== -1) currentWords.splice(index, 1);
+            div.remove();
+            if (currentWords.length === 1) {
+              showWinner(currentWords[0]);
+            } else {
+              showLoser(name);
+            }
+          }, 1000);
         };
         container.appendChild(div);
       });
