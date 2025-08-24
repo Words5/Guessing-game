@@ -12,6 +12,4 @@
 ## التقنيات المستخدمة:
 - HTML + CSS + JavaScript
 - GitHub Pages للنشر
-
-## رابط مباشر:
-`https://yourusername.github.io/random/`
+`
