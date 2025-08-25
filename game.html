@@ -5,16 +5,47 @@
   <title>لعبة الإيموجي</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #fafafa;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: #e0e0e0;
-      font-family: sans-serif;
     }
 
-    /* الصندوق الأساسي للنتيجة */
+    .game {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+    }
+
+    /* نافذة النتيجة */
     .result-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       width: 400px;
       height: 500px;
       border-radius: 20px;
@@ -27,14 +58,13 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      position: relative;
       overflow: hidden;
       text-align: center;
       padding: 20px;
       animation: fadeIn 0.5s ease;
+      z-index: 1000;
     }
 
-    /* شعاع إضاءة داخل الصندوق */
     .result-box::before {
       content: "";
       position: absolute;
@@ -53,7 +83,6 @@
       mix-blend-mode: screen;
     }
 
-    /* فائز */
     .winner-box h1 {
       font-size: 32px;
       margin-bottom: 15px;
@@ -61,7 +90,6 @@
       z-index: 2;
     }
 
-    /* خاسر */
     .loser-box h1 {
       font-size: 32px;
       margin-bottom: 15px;
@@ -69,7 +97,6 @@
       z-index: 2;
     }
 
-    /* الإيموجي الكبير */
     .big-emoji {
       width: 180px;
       height: 180px;
@@ -88,7 +115,6 @@
       animation: float 3s ease-in-out infinite;
     }
 
-    /* إطار الاسم */
     .name-frame {
       margin-top: 10px;
       font-size: 22px;
@@ -101,7 +127,6 @@
       z-index: 2;
     }
 
-    /* النص السفلي */
     .status-text {
       margin-top: 15px;
       font-size: 20px;
@@ -120,33 +145,25 @@
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    /* زر للتجربة */
-    .btns {
-      position: fixed;
-      bottom: 20px;
-      display: flex;
-      gap: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #333;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
-
-  <!-- أزرار للتجربة -->
-  <div class="btns">
-    <button onclick="showWinner('أحمد','🎉')">جرب الفوز</button>
-    <button onclick="showLoser('سارة','💀')">جرب الخسارة</button>
+  <div class="game">
+    <div class="card" onclick="choose('أحمد','🎉')">🎉</div>
+    <div class="card" onclick="choose('سارة','🔥')">🔥</div>
+    <div class="card" onclick="choose('محمد','💀')">💀</div>
+    <div class="card" onclick="choose('ليلى','⭐')">⭐</div>
   </div>
 
   <script>
+    function choose(name, emoji) {
+      if (emoji === '⭐') {
+        showWinner(name, emoji);
+      } else {
+        showLoser(name, emoji);
+      }
+    }
+
     function showWinner(name, emoji) {
       closeBoxes();
       const box = document.createElement('div');
