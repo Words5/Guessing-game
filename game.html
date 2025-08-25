@@ -1,142 +1,48 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <title>اللعبة</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #e0e0e0;
-    }
+<!DOCTYPE html>  <html lang="ar">    <head>        <meta charset="UTF-8">      
+  <title>Emoji Display</title>      
+  <style>      
+    body {      
+      display: flex;      
+      justify-content: center;      
+      align-items: center;      
+      min-height: 100vh;      
+      background: #e0e0e0;      
+      font-family: sans-serif;      
+    }  .emoji-box {      
+  width: 200px;      
+  height: 300px;      
+  border-radius: 16px;      
+  background: linear-gradient(180deg, #fdfdfd, #f3f3f3);      
+  box-shadow:       
+    inset 0 0 40px rgba(255, 255, 255, 0.8),   /* إضاءة داخلية */      
+    inset 0 -40px 80px rgba(0, 0, 0, 0.25),    /* ظل داخلي أسفل */      
+    0 12px 25px rgba(0, 0, 0, 0.3);            /* ظل خارجي */      
+  display: flex;      
+  flex-direction: column;      
+  justify-content: center;      
+  align-items: center;      
+  position: relative;      
+  overflow: hidden;      
+}    /* تأثير إضاءة من فوق */  
+.emoji-box::before {  
+content: "";  
+position: absolute;  
+top: 0;  
+left: 0;  
+width: 100%;  
+height: 60%;  
+background: radial-gradient(circle at top center, rgba(255,255,255,0.9), transparent 70%);  
+pointer-events: none;  
+}  .emoji {
+font-size: 100px;
+z-index: 2;
+filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.35));
+animation: float 3s ease-in-out infinite;
+}
 
-    /* النوافذ */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
+@keyframes float {
+0% { transform: translateY(0); }
+50% { transform: translate
 
-    .result-box {
-      width: 350px;
-      height: 450px;
-      border-radius: 20px;
-      background: linear-gradient(180deg, #fdfdfd, #e8e8e8 60%, #cfcfcf 100%);
-      box-shadow: 
-        inset 0 0 60px rgba(255, 255, 255, 0.9),
-        inset 0 -80px 120px rgba(0,0,0,0.35),
-        0 20px 40px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      padding: 20px;
-    }
+رجع اللعبة مثل ما كانت اريد فقط التعديل على نافذة الفوز والخسارة
 
-    .result-box::before {
-      content: "";
-      position: absolute;
-      top: -30%;
-      left: -20%;
-      width: 140%;
-      height: 80%;
-      background: radial-gradient(circle at top center,
-        rgba(255,255,255,0.95),
-        rgba(255,255,255,0.3) 40%,
-        transparent 70%);
-      opacity: 0.9;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .result-box h1 {
-      font-size: 28px;
-      margin-bottom: 15px;
-      color: #d4af37;
-      z-index: 2;
-    }
-
-    .loser-box h1 {
-      color: crimson;
-    }
-
-    .name-frame {
-      border: 2px solid #444;
-      padding: 6px 12px;
-      margin-bottom: 15px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.6);
-      z-index: 2;
-    }
-
-    .big-emoji {
-      font-size: 120px;
-      z-index: 2;
-      filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.35));
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0); }
-    }
-
-    /* نافذة الخسارة */
-    .loser-box {
-      background: linear-gradient(180deg, #ffe5e5, #f5b5b5 60%, #e28a8a 100%);
-      box-shadow: 
-        inset 0 0 60px rgba(255, 200, 200, 0.9),
-        inset 0 -80px 120px rgba(0,0,0,0.35),
-        0 20px 40px rgba(0,0,0,0.4);
-    }
-  </style>
-</head>
-<body>
-
-  <!-- نافذة الفوز -->
-  <div class="modal" id="winModal">
-    <div class="result-box">
-      <h1>فزت!</h1>
-      <div class="name-frame" id="winnerName">اللاعب</div>
-      <div class="big-emoji" id="winnerEmoji">🎉</div>
-      <div>مبروك الفوز</div>
-    </div>
-  </div>
-
-  <!-- نافذة الخسارة -->
-  <div class="modal" id="loseModal">
-    <div class="result-box loser-box">
-      <h1>حظ أوفر!</h1>
-      <div class="name-frame" id="loserName">اللاعب</div>
-      <div class="big-emoji" id="loserEmoji">😢</div>
-      <div>خرج من اللعبة</div>
-    </div>
-  </div>
-
-  <script>
-    // مثال تجريبي لتشغيل النوافذ
-    // في لعبتك تستدعي هذي عند الفوز/الخسارة
-    function showWin(name, emoji) {
-      document.getElementById("winnerName").textContent = name;
-      document.getElementById("winnerEmoji").textContent = emoji;
-      document.getElementById("winModal").style.display = "flex";
-    }
-
-    function showLose(name, emoji) {
-      document.getElementById("loserName").textContent = name;
-      document.getElementById("loserEmoji").textContent = emoji;
-      document.getElementById("loseModal").style.display = "flex";
-    }
-  </script>
-
-</body>
-</html>
