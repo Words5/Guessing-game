@@ -68,7 +68,7 @@
       color: #333;
     }
 
-    /* --- نافذة النتيجة (شكل الصندوق) --- */
+    /* --- نافذة النتيجة (صندوق ثلاثي الأبعاد) --- */
     .result-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -82,33 +82,35 @@
     }
 
     .result-box {
-      width: 380px;
-      height: 500px;
+      width: 420px;
+      height: 520px;
       border-radius: 20px;
       background: linear-gradient(180deg, #f7f7f7, #d9d9d9);
       box-shadow: 
-        inset 0 0 60px rgba(0,0,0,0.6),   /* ظل داخلي (إحساس العمق) */
-        inset 0 20px 40px rgba(255,255,255,0.5), /* إضاءة داخلية */
-        0 25px 50px rgba(0,0,0,0.6);  /* ظل خارجي */
-      border: 6px solid #999; /* إطار خارجي */
+        inset 0 0 80px rgba(0,0,0,0.7),   /* ظل داخلي */
+        inset 0 20px 50px rgba(255,255,255,0.5), /* إضاءة داخلية */
+        0 25px 60px rgba(0,0,0,0.7);      /* ظل خارجي */
+      border: 10px solid #999; /* إطار خارجي سميك */
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
       text-align: center;
-      padding: 20px;
+      padding: 40px;
       transform: perspective(1200px) rotateX(8deg);
       overflow: hidden;
     }
 
+    /* حافة داخلية عميقة (الجوانب الداخلية للصندوق) */
     .result-box::before {
       content: "";
       position: absolute;
-      inset: 0;
-      border: 12px solid rgba(255,255,255,0.25); /* حافة داخلية */
+      top: 20px; left: 20px; right: 20px; bottom: 20px;
+      border: 14px solid rgba(0,0,0,0.25);
       border-radius: 14px;
       pointer-events: none;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
     }
 
     .result-box h1 {
@@ -162,7 +164,7 @@
     /* نافذة الخسارة */
     .loser-box {
       background: linear-gradient(180deg, #fff0f0, #d98c8c);
-      border: 6px solid #b20000;
+      border: 10px solid #b20000;
     }
   </style>
 </head>
